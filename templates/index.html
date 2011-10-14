@@ -1,0 +1,5 @@
+<ul>
+    {% for host in hosts %}
+    <li><a href="{{ url_for('host', hostname=host) }}">{{ host }}</a></li>
+    {% endfor %}
+</ul>
