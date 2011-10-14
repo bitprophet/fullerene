@@ -35,8 +35,7 @@ def index():
 @app.route('/hosts/<hostname>/')
 def host(hostname):
     data = nested_metrics(hostname)
-    baseurl = "%s/render?target=" % EXTERNAL
-    return flask.render_template('host.html', metrics=data, baseurl=baseurl)
+    return flask.render_template('host.html', metrics=data, baseurl=EXTERNAL)
 
 
 if __name__ == "__main__":

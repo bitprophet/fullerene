@@ -1,4 +1,4 @@
-{% for metric in metrics %}
+{% for metric in metrics[:10] %}
 <h3>{{ metric }}</h3>
-{{ baseurl }}{{ metric }}
+<img src="{{ baseurl }}/render/?target={{ metric }}&height=200&width=400&from=-2hours" />
 {% endfor %}
