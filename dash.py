@@ -12,13 +12,10 @@ EXCLUDE_HOSTS = ("carbon",)
 DEFAULT_HOST_METRICS = (
     'df.root.df_complex.free.value',
     'df.mnt.df_complex.free.value',
-    'disk.xvda1.disk_octets.read',
-    'disk.xvda1.disk_octets.write',
-    'disk.xvdb.disk_octets.read',
-    'disk.xvdb.disk_octets.write',
-    'interface.if_octets.eth0.rx',
-    'interface.if_octets.eth0.tx',
-    'load.load.midterm',
+    'disk.xvda1.disk_octets.{read,write}',
+    'disk.xvdb.disk_octets.{read,write}',
+    'interface.if_octets.eth0.{rx,tx}',
+    'load.load.{shortterm,midterm,longterm}',
     'memory.memory.free.value',
 )
 
