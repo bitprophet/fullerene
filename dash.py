@@ -21,7 +21,7 @@ def metrics(queries, leaves_only=False):
     return struct['results']
 
 def nested_metrics(base):
-    MAX=7
+    MAX = 7
     queries = []
     for num in range(1, MAX + 1):
         query = "%s.%s" % (base, ".".join(['*'] * num))
