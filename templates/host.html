@@ -1,19 +1,13 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container">
-            {% for chunk in metrics[:5]|batch(2) %}
-            <div class="row">
-                {% for metric in chunk %}
-                <div class="span7">
-                    <p><strong>{{ metric }}</strong></p>
-                    <img src="{{ baseurl }}/render/?target={{ metric }}&height=200&width=400&from=-2hours" />
-                </div>
-                {% endfor %}
-            </div>
-            {% endfor %}
-        </div>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block body %}
+{% for chunk in metrics[:5]|batch(2) %}
+<div class="row">
+    {% for metric in chunk %}
+    <div class="span7">
+        <p><strong>{{ metric }}</strong></p>
+        <img src="{{ baseurl }}/render/?target={{ metric }}&height=200&width=400&from=-2hours" />
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

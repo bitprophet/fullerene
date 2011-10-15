@@ -1,5 +1,6 @@
 import json
 import pprint
+from collections import defaultdict
 
 import flask
 import requests
@@ -30,7 +31,12 @@ def nested_metrics(base):
 
 @app.route('/')
 def index():
-    return flask.render_template('index.html', hosts=metrics("*"))
+    hosts = metrics("*")
+    domains = defaultdict(list)
+    for host in hosts:
+        name, _, domain = host.partition('_')
+        domains[domain].append(name)
+    return flask.render_template('index.html', domains=domains.iteritems())
 
 @app.route('/hosts/<hostname>/')
 def host(hostname):

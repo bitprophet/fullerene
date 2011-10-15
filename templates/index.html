@@ -1,5 +1,15 @@
+{% extends "base.html" %}
+{% block body %}
 <ul>
-    {% for host in hosts %}
-    <li><a href="{{ url_for('host', hostname=host) }}">{{ host }}</a></li>
+    {% for domain, hosts in domains %}
+    <li>
+        <strong>{{ domain }}</strong>
+        <ul>
+            {% for host in hosts %}
+            <li><a href="{{ url_for('host', hostname=host + '_' + domain) }}">{{ host }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
     {% endfor %}
 </ul>
+{% endblock %}
