@@ -9,6 +9,18 @@ import requests
 INTERNAL = "http://localhost"
 EXTERNAL = "https://monitor2.whiskeymedia.com"
 EXCLUDE_HOSTS = ("carbon",)
+DEFAULT_HOST_METRICS = (
+    'df.root.df_complex.free.value',
+    'df.mnt.df_complex.free.value',
+    'disk.xvda1.disk_octets.read',
+    'disk.xvda1.disk_octets.write',
+    'disk.xvdb.disk_octets.read',
+    'disk.xvdb.disk_octets.write',
+    'interface.if_octets.eth0.rx',
+    'interface.if_octets.eth0.tx',
+    'load.load.midterm',
+    'memory.memory.free.value',
+)
 
 app = flask.Flask(__name__)
 
@@ -43,8 +55,14 @@ def index():
 
 @app.route('/hosts/<hostname>/')
 def host(hostname):
-    data = nested_metrics(hostname)
-    return flask.render_template('host.html', metrics=data, baseurl=EXTERNAL)
+    all_metrics = nested_metrics(hostname)
+    return flask.render_template(
+        'host.html',
+        hostname=hostname,
+        all_metrics=all_metrics,
+        base_metrics=DEFAULT_HOST_METRICS,
+        baseurl=EXTERNAL
+    )
 
 
 if __name__ == "__main__":

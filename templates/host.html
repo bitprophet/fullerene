@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block body %}
-{% for chunk in metrics[:5]|batch(2) %}
+{% for chunk in base_metrics|batch(2) %}
 <div class="row">
     {% for metric in chunk %}
     <div class="span7">
+        <img src="{{ baseurl }}/render/?target={{hostname}}.{{ metric }}&height=200&width=400&from=-2hours" />
         <p><strong>{{ metric }}</strong></p>
-        <img src="{{ baseurl }}/render/?target={{ metric }}&height=200&width=400&from=-2hours" />
     </div>
     {% endfor %}
 </div>
