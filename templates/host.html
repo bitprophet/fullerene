@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
+<div class="row">
+    <div class="span16">
+        <h1>{{ hostname }}</h1>
+    </div>
+</div>
 {% for chunk in base_metrics|batch(2) %}
 <div class="row">
     {% for metric in chunk %}
