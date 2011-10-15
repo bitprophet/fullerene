@@ -8,6 +8,7 @@ import requests
 
 INTERNAL = "http://localhost"
 EXTERNAL = "https://monitor2.whiskeymedia.com"
+EXCLUDE_HOSTS = ("carbon",)
 
 app = flask.Flask(__name__)
 
@@ -17,8 +18,9 @@ def metrics(queries, leaves_only=False):
     if leaves_only:
         url += "&leavesOnly=1"
     response = requests.get(url)
-    struct = json.loads(response.content)
-    return struct['results']
+    struct = json.loads(response.content)['results']
+    filtered = filter(lambda x: x not in EXCLUDE_HOSTS, struct)
+    return filtered
 
 def nested_metrics(base):
     MAX = 7
