@@ -38,7 +38,8 @@ def index():
     for host in hosts:
         name, _, domain = host.partition('_')
         domains[domain].append(name)
-    return flask.render_template('index.html', domains=domains.iteritems())
+    domains = sorted(domains.iteritems())
+    return flask.render_template('index.html', domains=domains)
 
 @app.route('/hosts/<hostname>/')
 def host(hostname):
