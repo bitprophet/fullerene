@@ -5,6 +5,7 @@ from collections import defaultdict
 import flask
 import requests
 import yaml
+import werkzeug
 
 
 with open("config.yml") as fd:
@@ -14,7 +15,7 @@ app = flask.Flask(__name__)
 
 def metrics(queries, leaves_only=False):
     query = "?" + "&".join(map(lambda x: "query=%s" % x, queries))
-    url = config['graphite_urls']['internal'] + "/metrics/expand/%s" % query
+    url = config['graphite_url'] + "/metrics/expand/%s" % query
     if leaves_only:
         url += "&leavesOnly=1"
     response = requests.get(url)
@@ -29,6 +30,18 @@ def nested_metrics(base):
         query = "%s.%s" % (base, ".".join(['*'] * num))
         queries.append(query)
     return metrics(queries, leaves_only=True)
+
+
+@app.route('/render/')
+def render():
+    url = config['graphite_url'] + "/render/"
+    response = requests.get(url, params=flask.request.args)
+    r = flask.Response(
+        response=response.raw,
+        headers=werkzeug.Headers(response.headers),
+        direct_passthrough=True
+    )
+    return r
 
 
 @app.route('/')
@@ -49,7 +62,7 @@ def host(hostname):
         hostname=hostname,
         all_metrics=all_metrics,
         base_metrics=config['hosts']['default_metrics'],
-        baseurl=config['graphite_urls']['external']
+        baseurl=""
     )
 
 

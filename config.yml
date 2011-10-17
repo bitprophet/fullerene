@@ -1,6 +1,4 @@
-graphite_urls:
-  internal: http://localhost
-  external: https://monitor2.whiskeymedia.com
+graphite_url: http://localhost
 hosts:
   exclude:
     - carbon
