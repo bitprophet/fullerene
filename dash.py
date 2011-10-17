@@ -60,14 +60,21 @@ def _render(hostname, metric, **overrides):
     Use: {{ hostname|render(metric, from='-2hours', ...) }}
 
     Will filter the 'from' kwarg through config['periods'] first.
+
+    Also sets a default 'title' kwarg to metric + period/from.
     """
-    if 'from' in overrides:
-        f = overrides['from']
-        overrides['from'] = config['periods'].get(f, f)
+    # Merge with defaults from config
+    kwargs = dict(config['defaults'], **overrides)
+    # Set a default (runtime) title
+    if 'title' not in kwargs:
+        kwargs['title'] = "%s (%s)" % (metric, kwargs['from'])
+    # Translate period names in 'from' kwarg if needed
+    f = kwargs['from']
+    kwargs['from'] = config['periods'].get(f, f)
     return flask.url_for(
         'render',
         target="%s.%s" % (hostname, metric),
-        **dict(config['defaults'], **overrides)
+        **kwargs
     )
 
 #
