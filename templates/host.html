@@ -3,7 +3,18 @@
 <div class="row">
     <div class="span16">
         <h1 style="margin-bottom: 0">{{ hostname }}</h1>
-        <p><strong><a href="/">&laquo; Back to index</a></strong></p>
+        <p>
+            <strong><a href="{{ url_for('index') }}">&laquo; all hosts</a></strong>
+            |
+            {% for group in groupings %}
+                {% if group == current %}
+                    <strong>{{ group }}</strong>
+                {% else %}
+                    <a href="{{ url_for('grouping', group=group, hostname=hostname) }}">{{ group }}</a>
+                {% endif %}
+                {% if not loop.last %}|{% endif %}
+            {% endfor %}
+        </p>
     </div>
 </div>
 {% for chunk in metrics|batch(2) %}

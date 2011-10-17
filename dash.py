@@ -32,6 +32,10 @@ def nested_metrics(base):
     return metrics(queries, leaves_only=True)
 
 
+def groupings():
+    return sorted(config['metrics'].keys())
+
+
 @app.route('/render/')
 def render():
     url = config['graphite_url'] + "/render/"
@@ -55,7 +59,7 @@ def index():
     return flask.render_template(
         'index.html',
         domains=domains,
-        groupings=sorted(config['metrics'].keys())
+        groupings=groupings()
     )
 
 @app.route('/hosts/<hostname>/')
@@ -75,7 +79,9 @@ def grouping(hostname, group):
         'host.html',
         hostname=hostname,
         metrics=config['metrics'][group],
-        baseurl=""
+        baseurl="",
+        groupings=groupings(),
+        current=group
     )
 
 
