@@ -4,11 +4,12 @@ from collections import defaultdict
 
 import flask
 import requests
+import yaml
 
 
-INTERNAL = "http://localhost"
-EXTERNAL = "https://monitor2.whiskeymedia.com"
-EXCLUDE_HOSTS = ("carbon",)
+with open("config.yml") as fd:
+    config = yaml.load(fd)
+
 DEFAULT_HOST_METRICS = (
     'df.root.df_complex.free.value',
     'df.mnt.df_complex.free.value',
@@ -23,12 +24,12 @@ app = flask.Flask(__name__)
 
 def metrics(queries, leaves_only=False):
     query = "?" + "&".join(map(lambda x: "query=%s" % x, queries))
-    url = INTERNAL + "/metrics/expand/%s" % query
+    url = config['graphite_urls']['internal'] + "/metrics/expand/%s" % query
     if leaves_only:
         url += "&leavesOnly=1"
     response = requests.get(url)
     struct = json.loads(response.content)['results']
-    filtered = filter(lambda x: x not in EXCLUDE_HOSTS, struct)
+    filtered = filter(lambda x: x not in config['hosts']['exclude'], struct)
     return filtered
 
 def nested_metrics(base):
@@ -58,7 +59,7 @@ def host(hostname):
         hostname=hostname,
         all_metrics=all_metrics,
         base_metrics=DEFAULT_HOST_METRICS,
-        baseurl=EXTERNAL
+        baseurl=config['graphite_urls']['external']
     )
 
 
