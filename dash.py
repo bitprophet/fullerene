@@ -13,7 +13,8 @@ import werkzeug
 # Set up globals
 #
 
-with open("config.yml") as fd:
+CONFIG = "config.yml"
+with open(CONFIG) as fd:
     config = yaml.load(fd)
 
 app = flask.Flask(__name__)
@@ -110,4 +111,4 @@ def grouping(hostname, group):
 #
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=8080, debug=True)
+    app.run(host='localhost', port=8080, debug=True, extra_files=(CONFIG,))

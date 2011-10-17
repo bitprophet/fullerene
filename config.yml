@@ -5,7 +5,7 @@ hosts:
 defaults:
   height: 200
   width: 400
-  from: -2hours
+  from: -4hours
 metrics:
   baseline:
     - df.root.df_complex.free.value
