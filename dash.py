@@ -10,16 +10,6 @@ import yaml
 with open("config.yml") as fd:
     config = yaml.load(fd)
 
-DEFAULT_HOST_METRICS = (
-    'df.root.df_complex.free.value',
-    'df.mnt.df_complex.free.value',
-    'disk.xvda1.disk_octets.{read,write}',
-    'disk.xvdb.disk_octets.{read,write}',
-    'interface.if_octets.eth0.{rx,tx}',
-    'load.load.{shortterm,midterm,longterm}',
-    'memory.memory.free.value',
-)
-
 app = flask.Flask(__name__)
 
 def metrics(queries, leaves_only=False):
@@ -58,7 +48,7 @@ def host(hostname):
         'host.html',
         hostname=hostname,
         all_metrics=all_metrics,
-        base_metrics=DEFAULT_HOST_METRICS,
+        base_metrics=config['hosts']['default_metrics'],
         baseurl=config['graphite_urls']['external']
     )
 
