@@ -21,7 +21,7 @@
 <div class="row">
     {% for period in ('day', 'week') %}
     <div class="span7">
-        <img src="{{ hostname|render(metric, from=period) }}" />
+        <p><img src="{{ hostname|render(metric, from=period) }}" /></p>
     </div>
     {% endfor %}
 </div>
