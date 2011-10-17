@@ -2,7 +2,8 @@ graphite_url: http://localhost
 hosts:
   exclude:
     - carbon
-  default_metrics:
+metrics:
+  baseline:
     - df.root.df_complex.free.value
     - df.mnt.df_complex.free.value
     - disk.xvda1.disk_octets.{read,write}
@@ -10,3 +11,6 @@ hosts:
     - interface.if_octets.eth0.{rx,tx}
     - load.load.{shortterm,midterm,longterm}
     - memory.memory.free.value
+  disk:
+    - df.*.df_complex.free.value
+    - disk.*.disk_octets.{read,write}

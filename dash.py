@@ -52,7 +52,11 @@ def index():
         name, _, domain = host.partition('_')
         domains[domain].append(name)
     domains = sorted(domains.iteritems())
-    return flask.render_template('index.html', domains=domains)
+    return flask.render_template(
+        'index.html',
+        domains=domains,
+        groupings=sorted(config['metrics'].keys())
+    )
 
 @app.route('/hosts/<hostname>/')
 def host(hostname):
@@ -61,7 +65,16 @@ def host(hostname):
         'host.html',
         hostname=hostname,
         all_metrics=all_metrics,
-        base_metrics=config['hosts']['default_metrics'],
+        base_metrics=config['metrics']['baseline'],
+        baseurl=""
+    )
+
+@app.route('/hosts/<hostname>/<group>/')
+def grouping(hostname, group):
+    return flask.render_template(
+        'host.html',
+        hostname=hostname,
+        metrics=config['metrics'][group],
         baseurl=""
     )
 

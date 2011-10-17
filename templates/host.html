@@ -5,7 +5,7 @@
         <h1>{{ hostname }}</h1>
     </div>
 </div>
-{% for chunk in base_metrics|batch(2) %}
+{% for chunk in metrics|batch(2) %}
 <div class="row">
     {% for metric in chunk %}
     <div class="span7">

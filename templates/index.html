@@ -6,7 +6,15 @@
         <strong>{{ domain }}</strong>
         <ul>
             {% for host in hosts %}
-            <li><a href="{{ url_for('host', hostname=host + '_' + domain) }}">{{ host }}</a></li>
+            <li>
+                <strong>{{ host }}</strong>
+                [
+                {% for group in groupings %}
+                <a href="{{ url_for('grouping', hostname=host + '_' + domain,
+                    group=group) }}">{{ group }}</a>
+                {% endfor %}
+                ]
+            </li>
             {% endfor %}
         </ul>
     </li>
