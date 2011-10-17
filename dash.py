@@ -1,7 +1,5 @@
 import json
-import pprint
 from collections import defaultdict
-import urllib
 
 import flask
 import requests
