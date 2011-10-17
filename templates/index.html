@@ -3,7 +3,7 @@
 <ul>
     {% for domain, hosts in domains %}
     <li>
-        <strong>{{ domain }}</strong>
+        <strong>{{ domain|dots }}</strong>
         <ul>
             {% for host in hosts %}
             <li>

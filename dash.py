@@ -45,6 +45,15 @@ def groupings():
 
 
 #
+# Template filters
+#
+
+@app.template_filter('dots')
+def dots(s):
+    return s.replace('_', '.')
+
+
+#
 # Routes
 #
 
