@@ -2,7 +2,8 @@
 {% block body %}
 <div class="row">
     <div class="span16">
-        <h1>{{ hostname }}</h1>
+        <h1 style="margin-bottom: 0">{{ hostname }}</h1>
+        <p><strong><a href="/">&laquo; Back to index</a></strong></p>
     </div>
 </div>
 {% for chunk in metrics|batch(2) %}
