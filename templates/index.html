@@ -7,13 +7,12 @@
         <ul>
             {% for host in hosts %}
             <li>
-                <strong>{{ host }}</strong>
-                [
+                <strong>{{ host }}:</strong>
                 {% for group in groupings %}
                 <a href="{{ url_for('grouping', hostname=host + '_' + domain,
                     group=group) }}">{{ group }}</a>
+                {% if not loop.last %}|{% endif %}
                 {% endfor %}
-                ]
             </li>
             {% endfor %}
         </ul>
