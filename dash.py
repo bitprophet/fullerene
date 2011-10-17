@@ -106,16 +106,6 @@ def index():
         groupings=groupings()
     )
 
-@app.route('/hosts/<hostname>/')
-def host(hostname):
-    all_metrics = nested_metrics(hostname)
-    return flask.render_template(
-        'host.html',
-        hostname=hostname,
-        all_metrics=all_metrics,
-        base_metrics=config['metrics']['baseline'],
-    )
-
 @app.route('/hosts/<hostname>/<group>/')
 def grouping(hostname, group):
     return flask.render_template(
