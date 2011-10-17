@@ -4,7 +4,6 @@ from collections import defaultdict
 import flask
 import requests
 import yaml
-import werkzeug
 
 
 #
@@ -122,8 +121,7 @@ def render():
     response = requests.get(url, params=flask.request.args)
     r = flask.Response(
         response=response.raw,
-        headers=werkzeug.Headers(response.headers),
-        direct_passthrough=True
+        headers=response.headers,
     )
     return r
 
