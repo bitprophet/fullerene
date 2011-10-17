@@ -21,7 +21,7 @@
 <div class="row">
     {% for metric in chunk %}
     <div class="span7">
-        <img src="{{ baseurl }}/render/?target={{hostname}}.{{ metric }}&height=200&width=400&from=-2hours" />
+        <img src="/render/?target={{hostname}}.{{ metric }}&{{ get_params }}" />
         <p><strong>{{ metric }}</strong></p>
     </div>
     {% endfor %}

@@ -2,6 +2,10 @@ graphite_url: http://localhost
 hosts:
   exclude:
     - carbon
+defaults:
+  height: 200
+  width: 400
+  from: -2hours
 metrics:
   baseline:
     - df.root.df_complex.free.value

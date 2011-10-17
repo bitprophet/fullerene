@@ -1,6 +1,7 @@
 import json
 import pprint
 from collections import defaultdict
+import urllib
 
 import flask
 import requests
@@ -90,7 +91,6 @@ def host(hostname):
         hostname=hostname,
         all_metrics=all_metrics,
         base_metrics=config['metrics']['baseline'],
-        baseurl=""
     )
 
 @app.route('/hosts/<hostname>/<group>/')
@@ -99,9 +99,9 @@ def grouping(hostname, group):
         'host.html',
         hostname=hostname,
         metrics=config['metrics'][group],
-        baseurl="",
         groupings=groupings(),
-        current=group
+        current=group,
+        get_params=urllib.urlencode(config['defaults'])
     )
 
 
