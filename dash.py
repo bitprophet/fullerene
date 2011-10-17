@@ -8,10 +8,19 @@ import yaml
 import werkzeug
 
 
+#
+# Set up globals
+#
+
 with open("config.yml") as fd:
     config = yaml.load(fd)
 
 app = flask.Flask(__name__)
+
+
+#
+# Helpers/utils
+#
 
 def metrics(queries, leaves_only=False):
     query = "?" + "&".join(map(lambda x: "query=%s" % x, queries))
@@ -31,10 +40,13 @@ def nested_metrics(base):
         queries.append(query)
     return metrics(queries, leaves_only=True)
 
-
 def groupings():
     return sorted(config['metrics'].keys())
 
+
+#
+# Routes
+#
 
 @app.route('/render/')
 def render():
@@ -46,7 +58,6 @@ def render():
         direct_passthrough=True
     )
     return r
-
 
 @app.route('/')
 def index():
@@ -84,6 +95,10 @@ def grouping(hostname, group):
         current=group
     )
 
+
+#
+# Runner
+#
 
 if __name__ == "__main__":
     app.run(host='localhost', port=8080, debug=True)
