@@ -9,8 +9,12 @@ metrics:
     - disk.xvda1.disk_octets.{read,write}
     - disk.xvdb.disk_octets.{read,write}
     - interface.if_octets.eth0.{rx,tx}
-    - load.load.{shortterm,midterm,longterm}
+    - load.load.*
     - memory.memory.free.value
   disk:
     - df.*.df_complex.free.value
     - disk.*.disk_octets.{read,write}
+  cpu:
+    - load.load.*
+  network:
+    - interface.if_octets.eth0.{rx,tx}
