@@ -54,6 +54,16 @@ def groupings():
 def dots(s):
     return s.replace('_', '.')
 
+@app.template_filter('render')
+def _render(hostname, metric, **overrides):
+    """
+    Use: {{ hostname|render(metric, from='-2hours', ...) }}
+    """
+    return flask.url_for(
+        'render',
+        target="%s.%s" % (hostname, metric),
+        **dict(config['defaults'], **overrides)
+    )
 
 #
 # Routes
@@ -102,7 +112,6 @@ def grouping(hostname, group):
         metrics=config['metrics'][group],
         groupings=groupings(),
         current=group,
-        get_params=urllib.urlencode(config['defaults'])
     )
 
 
