@@ -25,6 +25,11 @@ app = flask.Flask(__name__)
 #
 
 def metrics(queries, leaves_only=False):
+    """
+    Return list of metric paths based on one or more search queries.
+
+    Basically just a wrapper around Graphite's /metrics/expand/ endpoint.
+    """
     query = "?" + "&".join(map(lambda x: "query=%s" % x, queries))
     url = config['graphite_url'] + "/metrics/expand/%s" % query
     if leaves_only:
@@ -34,10 +39,18 @@ def metrics(queries, leaves_only=False):
     filtered = filter(lambda x: x not in config['hosts']['exclude'], struct)
     return filtered
 
-def nested_metrics(base):
-    MAX = 7
+def nested_metrics(base, max_depth=7):
+    """
+    Return *all* metrics starting with the given ``base`` pattern/string.
+
+    Assumes maximum realistic depth of ``max_depth``, due to the method
+    required to get multiple levels of metric paths out of Graphite.
+
+    If run with ``base="*"`` be prepared to wait a very long time for any
+    nontrivial Graphite installation to come back with the answer...
+    """
     queries = []
-    for num in range(1, MAX + 1):
+    for num in range(1, max_depth + 1):
         query = "%s.%s" % (base, ".".join(['*'] * num))
         queries.append(query)
     return metrics(queries, leaves_only=True)
@@ -57,7 +70,7 @@ def dots(s):
 @app.template_filter('render')
 def _render(hostname, metric, **overrides):
     """
-    Use: {{ hostname|render(metric, from='-2hours', ...) }}
+    Use: {{ hostname|render(metric, from='-2hours', height=400, ...) }}
 
     Will filter the 'from' kwarg through config['periods'] first.
 
@@ -80,17 +93,6 @@ def _render(hostname, metric, **overrides):
 #
 # Routes
 #
-
-@app.route('/render/')
-def render():
-    url = config['graphite_url'] + "/render/"
-    response = requests.get(url, params=flask.request.args)
-    r = flask.Response(
-        response=response.raw,
-        headers=werkzeug.Headers(response.headers),
-        direct_passthrough=True
-    )
-    return r
 
 @app.route('/')
 def index():
@@ -115,6 +117,17 @@ def grouping(hostname, group):
         groupings=groupings(),
         current=group,
     )
+
+@app.route('/render/')
+def render():
+    url = config['graphite_url'] + "/render/"
+    response = requests.get(url, params=flask.request.args)
+    r = flask.Response(
+        response=response.raw,
+        headers=werkzeug.Headers(response.headers),
+        direct_passthrough=True
+    )
+    return r
 
 
 #
