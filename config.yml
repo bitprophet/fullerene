@@ -6,6 +6,10 @@ defaults:
   height: 200
   width: 400
   from: -4hours
+periods:
+  recent: -4hours
+  day: -24hours
+  week: -7days
 metrics:
   baseline:
     - df.root.df_complex.free.value

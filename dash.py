@@ -58,7 +58,12 @@ def dots(s):
 def _render(hostname, metric, **overrides):
     """
     Use: {{ hostname|render(metric, from='-2hours', ...) }}
+
+    Will filter the 'from' kwarg through config['periods'] first.
     """
+    if 'from' in overrides:
+        f = overrides['from']
+        overrides['from'] = config['periods'].get(f, f)
     return flask.url_for(
         'render',
         target="%s.%s" % (hostname, metric),

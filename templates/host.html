@@ -17,14 +17,12 @@
         </p>
     </div>
 </div>
-{% for chunk in metrics|batch(2) %}
+{% for metric in metrics %}
 <div class="row">
-    {% for metric in chunk %}
+    {% for period in ('day', 'week') %}
     <div class="span7">
-        {# <img src="/render/?target={{hostname}}.{{ metric }}&{{ get_params
-        }}" /> --> #}
-        <img src="{{ hostname|render(metric) }}" />
-        <p><strong>{{ metric }}</strong></p>
+        <img src="{{ hostname|render(metric, from=period) }}" />
+        <p><strong>{{ metric }} ({{ period }})</strong></p>
     </div>
     {% endfor %}
 </div>
