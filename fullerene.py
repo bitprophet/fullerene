@@ -1,10 +1,12 @@
-import json
 from collections import defaultdict
 import operator
 
-import flask
 import requests
+import flask
 import yaml
+
+from metric import Metric
+from graphite import Graphite
 
 
 #
@@ -16,42 +18,14 @@ with open(CONFIG) as fd:
     config = yaml.load(fd)
 
 app = flask.Flask(__name__)
+graphite = Graphite(config)
 
 
 #
 # Helpers/utils
 #
 
-def metrics(queries, leaves_only=False):
-    """
-    Return list of metric paths based on one or more search queries.
 
-    Basically just a wrapper around Graphite's /metrics/expand/ endpoint.
-    """
-    query = "?" + "&".join(map(lambda x: "query=%s" % x, queries))
-    url = config['graphite_url'] + "/metrics/expand/%s" % query
-    if leaves_only:
-        url += "&leavesOnly=1"
-    response = requests.get(url)
-    struct = json.loads(response.content)['results']
-    filtered = filter(lambda x: x not in config['hosts']['exclude'], struct)
-    return filtered
-
-def nested_metrics(base, max_depth=7):
-    """
-    Return *all* metrics starting with the given ``base`` pattern/string.
-
-    Assumes maximum realistic depth of ``max_depth``, due to the method
-    required to get multiple levels of metric paths out of Graphite.
-
-    If run with ``base="*"`` be prepared to wait a very long time for any
-    nontrivial Graphite installation to come back with the answer...
-    """
-    queries = []
-    for num in range(1, max_depth + 1):
-        query = "%s.%s" % (base, ".".join(['*'] * num))
-        queries.append(query)
-    return metrics(queries, leaves_only=True)
 
 def groupings():
     return sorted(config['metrics'].keys())
@@ -119,40 +93,20 @@ def expand_metric(metric, hostname):
               0: [these, are, excluded, from, 1st, wildcard]
               1: [these, from, the, 2nd]
     """
-    if not hasattr(metric, "keys"):
-        return [metric]
-    if len(metric) > 1:
-        raise ValueError("Found metric value which is a dict but has >1 key! Please make sure your metrics list consists only of strings and one-item dicts.")
-    ret = []
-    key, options = metric.items()[0]
-    # Normalize implicit exclude list to index mapping
-    excludes = options['exclude']
-    if not hasattr(excludes, "keys"):
-        excludes = {0: excludes}
-    # Discover wildcard locations (so we can tell, while walking a split
-    # string, "which" wildcard we may be looking at (the 1st, 2nd, Nth)
-    parts = key.split('.')
-    wildcard_locations = []
-    for index, part in enumerate(parts):
-        if '*' in part:
-            wildcard_locations.append(index)
-    # Get all matching metrics
-    full_metric = "%s.%s" % (hostname, key)
-    expanded = metrics((full_metric,))
-    # Remove hostname part again now that we've done the query
-    expanded = map(lambda x: '.'.join(x.split('.')[1:]), expanded)
+    metric = Metric(metric, graphite)
     # Exclude
-    for item in expanded:
+    ret = []
+    for item in metric.expand(hostname):
         parts = item.split('.')
         good = True
         for location, part in enumerate(parts):
             # We only care about wildcard slots
-            if location not in wildcard_locations:
+            if location not in metric.wildcards:
                 continue
             # Which wildcard slot is this?
-            wildcard_index = wildcard_locations.index(location)
+            wildcard_index = metric.wildcards.index(location)
             # Is this substring listed for exclusion in this slot?
-            if part in excludes.get(wildcard_index, []):
+            if part in metric.excludes.get(wildcard_index, []):
                 good = False
                 break # move on to next metric/item
         if good:
@@ -204,7 +158,7 @@ def _render(hostname, metric, **overrides):
 
 @app.route('/')
 def index():
-    hosts = metrics("*")
+    hosts = graphite.query("*")
     domains = defaultdict(list)
     for host in hosts:
         name, _, domain = host.partition('_')
