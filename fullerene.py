@@ -119,8 +119,4 @@ def grouping(hostname, group):
 def render():
     url = config['graphite_url'] + "/render/"
     response = requests.get(url, params=flask.request.args)
-    r = flask.Response(
-        response=response.raw,
-        headers=response.headers,
-    )
-    return r
+    return flask.Response(response=response.raw, headers=response.headers)
