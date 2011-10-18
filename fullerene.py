@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+import operator
 
 import flask
 import requests
@@ -155,6 +156,9 @@ def expand_metric(metric):
             ret.append(item)
     return ret
 
+def metrics_for_group(name):
+    members = map(expand_metric, config['metrics'][name])
+    return reduce(operator.add, members, [])
 
 
 #
@@ -212,7 +216,7 @@ def grouping(hostname, group):
     return flask.render_template(
         'host.html',
         hostname=hostname,
-        metrics=config['metrics'][group],
+        metrics=metrics_for_group(group),
         groupings=groupings(),
         current=group,
     )
