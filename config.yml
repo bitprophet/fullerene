@@ -20,7 +20,8 @@ metrics:
     - load.load.*
     - memory.memory.free.value
   disk:
-    - df.*.df_complex.free.value
+    - df.*.df_complex.free.value:
+        exclude: [dev, dev-shm, var-lock, var-run]
     - disk.*.disk_octets.{read,write}
   cpu:
     - load.load.*

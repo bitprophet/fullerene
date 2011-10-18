@@ -56,7 +56,7 @@ def nested_metrics(base, max_depth=7):
 def groupings():
     return sorted(config['metrics'].keys())
 
-def expand_metric(metric):
+def expand_metric(metric, hostname):
     """
     Take metric string or one-key dict and normalize to an iterable as needed.
 
@@ -137,7 +137,10 @@ def expand_metric(metric):
         if '*' in part:
             wildcard_locations.append(index)
     # Get all matching metrics
-    expanded = metrics(key)
+    full_metric = "%s.%s" % (hostname, key)
+    expanded = metrics((full_metric,))
+    # Remove hostname part again now that we've done the query
+    expanded = map(lambda x: '.'.join(x.split('.')[1:]), expanded)
     # Exclude
     for item in expanded:
         parts = item.split('.')
@@ -156,9 +159,11 @@ def expand_metric(metric):
             ret.append(item)
     return ret
 
-def metrics_for_group(name):
-    members = map(expand_metric, config['metrics'][name])
-    return reduce(operator.add, members, [])
+def metrics_for_group(name, hostname):
+    raw_metrics = config['metrics'][name]
+    members = map(lambda x: expand_metric(x, hostname), raw_metrics)
+    merged = reduce(operator.add, members, [])
+    return merged
 
 
 #
@@ -216,7 +221,7 @@ def grouping(hostname, group):
     return flask.render_template(
         'host.html',
         hostname=hostname,
-        metrics=metrics_for_group(group),
+        metrics=metrics_for_group(group, hostname),
         groupings=groupings(),
         current=group,
     )
