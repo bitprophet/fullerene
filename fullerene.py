@@ -124,21 +124,36 @@ def expand_metric(metric):
         raise ValueError("Found metric value which is a dict but has >1 key! Please make sure your metrics list consists only of strings and one-item dicts.")
     ret = []
     key, options = metric.items()[0]
+    # Normalize implicit exclude list to index mapping
+    excludes = options['exclude']
+    if not hasattr(excludes, "keys"):
+        excludes = {0: excludes}
+    # Discover wildcard locations (so we can tell, while walking a split
+    # string, "which" wildcard we may be looking at (the 1st, 2nd, Nth)
     parts = key.split('.')
-    wildcard_indexes = []
+    wildcard_locations = []
     for index, part in enumerate(parts):
         if '*' in part:
-            wildcard_indexes.append(index)
+            wildcard_locations.append(index)
+    # Get all matching metrics
     expanded = metrics(key)
+    # Exclude
     for item in expanded:
         parts = item.split('.')
-        for index, part in enumerate(parts):
-            if index in wildcard_indexes and part in options['exclude']:
+        good = True
+        for location, part in enumerate(parts):
+            # We only care about wildcard slots
+            if location not in wildcard_locations:
                 continue
-        ret.append(item)
+            # Which wildcard slot is this?
+            wildcard_index = wildcard_locations.index(location)
+            # Is this substring listed for exclusion in this slot?
+            if part in excludes.get(wildcard_index, []):
+                good = False
+                break # move on to next metric/item
+        if good:
+            ret.append(item)
     return ret
-
-
 
 
 
