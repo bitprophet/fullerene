@@ -1,4 +1,4 @@
-graphite_url: http://localhost
+graphite_url: http://10.0.1.208:8081
 hosts:
   exclude:
     - carbon
