@@ -16,7 +16,7 @@ hook into that app's URL API.
 Fullerene is in very, very early stages of development and is not intended for
 public consumption. No, not even for those who routinely nab "pre-alpha"
 software.  This is only public for now so its code can be referenced in
-discussions and because we're too cheap to upgrade to a Github plan that offers
+discussions and because I'm too cheap to upgrade to a Github plan that offers
 more private collaborators :)
 
 ## Why?
@@ -27,10 +27,11 @@ Similar tools at time of writing (October 2011) were
 Neither of those tools quite fit the bill for our particular use case(s), nor
 were they a good fit for forking.
 
-Pencil had a good feature set but diverged from how we wanted such a tool to
-work, to such a degree that a greenfield project felt like less/equal effort.
+Pencil had a good feature set but diverged from how I wanted/needed such a tool
+to work, to such a degree that a greenfield project felt like less/equal
+effort.
 
-GDash was *too* simple for our needs, and did not have enough existing
-functionality to merit forking vs writing our own tool; plus our environment
-and talent pool is mostly Python, so using a small amount of Ruby code as a
+GDash was *too* simple for my needs, and did not have enough existing
+functionality to merit forking vs writing my own tool; plus I work in a team
+which is primarily used to Python, so using a small amount of Ruby code as a
 base did not make sense.
