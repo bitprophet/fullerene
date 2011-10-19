@@ -85,7 +85,7 @@ class Metric(object):
             expansions = self.wildcards 
         return expansions
 
-    def expand(self, hostname):
+    def expand(self, hostname=None):
         """
         Return expanded metric list from our path and the given ``hostname``.
 
@@ -101,12 +101,15 @@ class Metric(object):
         with non-expanded metric paths.)
         """
         sep = '.'
-        return map(
-            lambda x: sep.join(x.split(sep)[1:]),
-            self.graphite.query(sep.join([hostname, self.path]))
-        )
+        if hostname:
+            path = sep.join([hostname, self.path])
+            func = lambda x: sep.join(x.split(sep)[1:])
+        else:
+            path = self.path
+            func = lambda x: x
+        return map(func, self.graphite.query(path))
 
-    def normalize(self, hostname):
+    def normalize(self, hostname=None):
         """
         Return a list of one or more metric paths based on our options.
 
