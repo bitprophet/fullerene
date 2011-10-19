@@ -1,9 +1,10 @@
 from unittest import TestCase, main
 
 import mock
+import nose
 
 import fullerene
-from metric import combine
+from metric import Metric, combine
 
 
 def metrics(*args):
@@ -69,13 +70,22 @@ def metrics(*args):
 
 
 class TestPaths(TestCase):
-    def _test_combinations(self):
-        assert combine(["foo.bar"]) == ["foo.bar"]
-        assert combine(("foo.bar", "foo.biz")) == ["foo.{bar,biz}"]
-        assert combine(("foo.bar", "biz.baz")) == ["{foo,biz}.{bar,baz}"]
-        assert combine(("foo.1.bar", "foo.2.bar")) == ["foo.{1,2}.bar"]
-        result = combine(("foo.name.bar", "biz.name.baz"))
-        assert result == ["{foo,biz}.name.{bar,baz}"]
+    def test_combinations(self):
+        for desc, inputs, results in (
+            ("Single metric, no combinations",
+                ("foo.bar",), "foo.bar"),
+            ("Single combination at end",
+                ("foo.bar", "foo.biz"), "foo.{bar,biz}"),
+            ("Combinations in both of two positions",
+                ("foo.bar", "biz.baz"), "{foo,biz}.{bar,baz}"),
+            ("One combination in the 2nd of 3 positions",
+                ("foo.1.bar", "foo.2.bar"), "foo.{1,2}.bar"),
+            ("Two combinations surrounding one normal part",
+                ("foo.name.bar", "biz.name.baz"), "{foo,biz}.name.{bar,baz}"),
+        ):
+            eq_.description = desc
+            yield eq_, combine(inputs), [results]
+            del eq_.description
 
     def test_expansions(self):
         # Remember that expansion indexes apply only to wildcard slots,
