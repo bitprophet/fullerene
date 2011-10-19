@@ -3,7 +3,7 @@ hosts:
   exclude:
     - carbon
 defaults:
-  height: 200
+  height: 250
   width: 400
   from: -4hours
 periods:
@@ -23,7 +23,7 @@ metrics:
     - df.*.df_complex.free.value:
         exclude: [dev, dev-shm, var-lock, var-run]
         expand: all
-    - disk.*.disk_octets.{read,write}:
+    - disk.{xvda1,xvdb,xvdf}.disk_octets.{read,write}:
   cpu:
     - load.load.*
   network:
