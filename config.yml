@@ -22,7 +22,8 @@ metrics:
   disk:
     - df.*.df_complex.free.value:
         exclude: [dev, dev-shm, var-lock, var-run]
-    - disk.*.disk_octets.{read,write}
+        expand: all
+    - disk.*.disk_octets.{read,write}:
   cpu:
     - load.load.*
   network:

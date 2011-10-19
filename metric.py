@@ -1,3 +1,39 @@
+from collections import defaultdict
+from types import StringTypes
+
+
+def combine(paths, expansions=[]):
+    """
+    Take a list of paths and combine into fewer using brace-expressions.
+
+    E.g. ["foo.bar", "foo.biz"] => "foo.{bar,biz}"
+    """
+    buckets = defaultdict(list)
+    for path in paths:
+        for i, part in enumerate(path.split('.')):
+            if part not in buckets[i]:
+                buckets[i].append(part)
+    ret = [[]]
+    for key in sorted(buckets.keys()):
+        value = list(buckets[key])
+        if len(value) == 1:
+            for x in ret:
+                x.append(value[0])
+        else:
+            if key in expansions:
+                previous = ret[:]
+                ret = []
+                for x in value:
+                    for y in previous:
+                        ret.append(y + [x])
+            else:
+                joined = "{" + ",".join(value) + "}"
+                for x in ret:
+                    x.append(joined)
+    result = map(lambda x: '.'.join(x), ret)
+    return result
+
+
 class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
@@ -7,7 +43,10 @@ class Metric(object):
         Use ``struct`` to become a metric referring to ``graphite`` backend.
         """
         self.graphite = graphite
-        self.excludes = {}
+        options = {
+            'exclude': [],
+            'expand': [],
+        }
         # Non-dicts are assumed to be simple stringlike paths
         if not hasattr(struct, "keys"):
             self.path = struct
@@ -15,11 +54,14 @@ class Metric(object):
         else:
             if len(struct) > 1:
                 raise ValueError("Found metric value which is a dict but has >1 key! Please make sure your metrics list consists only of strings and one-item dicts.")
-            self.path, options = struct.items()[0]
-            self.excludes = self.set_excludes(options['exclude'])
+            self.path, local_options = struct.items()[0]
+            options = dict(options, **local_options)
         # Generate split version of our path, and note any wildcards
         self.parts = self.path.split('.')
         self.wildcards = self.find_wildcards()
+        # Normalize/clean up options
+        self.excludes = self.set_excludes(options['exclude'])
+        self.to_expand = self.set_expansions(options['expand'])
 
     def find_wildcards(self):
         """
@@ -34,13 +76,14 @@ class Metric(object):
         return wildcards
 
     def set_excludes(self, excludes):
-        """
-        Translate from-YAML dict into our object's API
-        """
-        # Excludes
         if not hasattr(excludes, "keys"):
             excludes = {0: excludes}
         return excludes
+
+    def set_expansions(self, expansions):
+        if expansions == "all":
+            expansions = self.wildcards 
+        return expansions
 
     def expand(self, hostname):
         """
@@ -68,13 +111,17 @@ class Metric(object):
         Return a list of one or more metric paths based on our options.
 
         For example, a basic ``Metric("foo.*")`` with no options would
-        normalize into simply ``["foo.*"]``. But ``Metric("foo.*", {'exclude':
-        [1,2]})`` would expand out, remove any matching exclusions, and return
-        e.g. ``["foo.3", "foo.4", "foo.5"]``.
+        normalize into simply ``["foo.*"]``. ``Metric("foo.*", {'exclude':
+        [1,2]})`` would expand out, remove any matching exclusions, compress
+        again, and return e.g. ``["foo.{3,4,5}]``. And ``Metric("foo.*",
+        {'expand': 'true'})`` would cause full expansion, returning e.g.
+        ``["foo.1", "foo.2", "foo.3", ...]``.
         """
+        # Not applying any filters == just the path
         if not self.excludes:
             return [self.path]
-        ret = []
+        # Expand out to full potential list of paths, apply filters
+        matches = []
         for item in self.expand(hostname):
             parts = item.split('.')
             good = True
@@ -89,5 +136,7 @@ class Metric(object):
                     good = False
                     break # move on to next metric/item
             if good:
-                ret.append(item)
-        return ret
+                matches.append(item)
+        # Perform any necessary combining into brace-expressions & return
+        return combine(matches, self.to_expand)
+

@@ -3,6 +3,7 @@ from unittest import TestCase, main
 import mock
 
 import fullerene
+from metric import combine
 
 
 def metrics(*args):
@@ -13,58 +14,78 @@ def metrics(*args):
     return inner
 
 
-class TestExpandMetrics(TestCase):
-    @metrics("foo.1.bar", "foo.2.bar", "foo.3.bar")
-    def test_implicit_exclude_list(self):
-        metric = {
-            "foo.*.bar": {
-                "exclude": {0: ['1', '2']}
-            }
-        }
-        result = fullerene.expand_metric(metric)
-        assert result == ["foo.3.bar"]
+#class TestExpandMetrics(TestCase):
+#    @metrics("foo.1.bar", "foo.2.bar", "foo.3.bar")
+#    def test_implicit_exclude_list(self):
+#        metric = {
+#            "foo.*.bar": {
+#                "exclude": {0: ['1', '2']}
+#            }
+#        }
+#        result = fullerene.expand_metric(metric)
+#        assert result == ["foo.3.bar"]
+#
+#    @metrics("foo.1.2", "foo.1.1", "foo.3.1")
+#    def test_implicit_exclude_list_applies_to_first_wildcard_only(self):
+#        metric = {
+#            "foo.*.*": {
+#                "exclude": ['1']
+#            }
+#        }
+#        result = fullerene.expand_metric(metric)
+#        assert result == ["foo.3.1"]
+#
+#    @metrics("foo.1.bar", "foo.2.bar", "foo.3.bar")
+#    def test_explicit_exclude_list(self):
+#        metric = {
+#            "foo.*.bar": {
+#                "exclude": {
+#                    0: ['1', '2']
+#                }
+#            }
+#        }
+#        result = fullerene.expand_metric(metric)
+#        assert result == ["foo.3.bar"]
+#
+#    @metrics(
+#        # Doesn't match any excludes
+#        "foo.2.bar.biz.baz",
+#        # Matches exclude in 1st wildcard slot
+#        "foo.1.2.3.4",
+#        # Matches exclude in 3rd wildcard slot
+#        "foo.bar.biz.2.bar"
+#    )
+#    def test_explicit_exclude_list_multiple_wildcards(self):
+#        metric = {
+#            "foo.*.bar.*.*": {
+#                "exclude": {
+#                    0: ['1'],
+#                    2: ["bar"]
+#                }
+#            }
+#        }
+#        result = fullerene.expand_metric(metric)
+#        assert result == ["foo.2.bar.biz.baz"]
 
-    @metrics("foo.1.2", "foo.1.1", "foo.3.1")
-    def test_implicit_exclude_list_applies_to_first_wildcard_only(self):
-        metric = {
-            "foo.*.*": {
-                "exclude": ['1']
-            }
-        }
-        result = fullerene.expand_metric(metric)
-        assert result == ["foo.3.1"]
 
-    @metrics("foo.1.bar", "foo.2.bar", "foo.3.bar")
-    def test_explicit_exclude_list(self):
-        metric = {
-            "foo.*.bar": {
-                "exclude": {
-                    0: ['1', '2']
-                }
-            }
-        }
-        result = fullerene.expand_metric(metric)
-        assert result == ["foo.3.bar"]
+class TestPaths(TestCase):
+    def _test_combinations(self):
+        assert combine(["foo.bar"]) == ["foo.bar"]
+        assert combine(("foo.bar", "foo.biz")) == ["foo.{bar,biz}"]
+        assert combine(("foo.bar", "biz.baz")) == ["{foo,biz}.{bar,baz}"]
+        assert combine(("foo.1.bar", "foo.2.bar")) == ["foo.{1,2}.bar"]
+        result = combine(("foo.name.bar", "biz.name.baz"))
+        assert result == ["{foo,biz}.name.{bar,baz}"]
 
-    @metrics(
-        # Doesn't match any excludes
-        "foo.2.bar.biz.baz",
-        # Matches exclude in 1st wildcard slot
-        "foo.1.2.3.4",
-        # Matches exclude in 3rd wildcard slot
-        "foo.bar.biz.2.bar"
-    )
-    def test_explicit_exclude_list_multiple_wildcards(self):
-        metric = {
-            "foo.*.bar.*.*": {
-                "exclude": {
-                    0: ['1'],
-                    2: ["bar"]
-                }
-            }
-        }
-        result = fullerene.expand_metric(metric)
-        assert result == ["foo.2.bar.biz.baz"]
+    def test_expansions(self):
+        # Remember that expansion indexes apply only to wildcard slots,
+        # which here are slots which differ from path to path and would thus
+        # get combined by default.
+        result = combine(["foo.bar", "foo.biz"], expansions=[1])
+        assert result == ["foo.bar", "foo.biz"]
+        result = combine(["1.2", "3.4"], expansions=[0, 1])
+        assert set(result) == set(["1.2", "3.4", "1.4", "3.2"])
+
 
 if __name__ == '__main__':
     main()
