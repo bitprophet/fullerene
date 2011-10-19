@@ -1,75 +1,46 @@
-from unittest import TestCase, main
-
 import mock
-import nose
+from nose.tools import eq_
 
-import fullerene
 from metric import Metric, combine
 
 
-def metrics(*args):
-    def fake_metrics(pattern):
-        return args
-    def inner(func):
-        return mock.patch('fullerene.metrics', fake_metrics)(func)
-    return inner
+class TestMetrics(object):
+    def test_exclusions(self):
+        for desc, struct, expansions, result in (
+            ("Implicit exclude list",
+                {"foo.*.bar": {"exclude": {0: ['1', '2']}}},
+                ("foo.1.bar", "foo.2.bar", "foo.3.bar"),
+                "foo.3.bar"
+            ),
+            ("Implicit exclude list applied only to 1st wildcard",
+                {"foo.*.*": {"exclude": ['1']}},
+                ("foo.1.2", "foo.1.1", "foo.3.1"),
+                "foo.3.1"
+            ),
+            ("Explicit exclude list",
+                {"foo.*.bar": {"exclude": {0: ['1', '2']}}},
+                ("foo.1.bar", "foo.2.bar", "foo.3.bar"),
+                "foo.3.bar"
+            ),
+            ("Explicit exclude list, multiple wildcards",
+                {"foo.*.bar.*.*": {"exclude": {0: ['1'], 2: ["bar"]}}},
+                (
+                    # Doesn't match any excludes
+                    "foo.2.bar.biz.baz",
+                    # Matches exclude in 1st wildcard slot
+                    "foo.1.2.3.4",
+                    # Matches exclude in 3rd wildcard slot
+                    "foo.bar.biz.2.bar"
+                ),
+                "foo.2.bar.biz.baz"
+            ),
+        ):
+            graphite = mock.Mock()
+            graphite.query.return_value = expansions
+            eq_.description = desc
+            yield eq_, Metric(struct, graphite).normalize(), [result]
+            del eq_.description
 
-
-#class TestExpandMetrics(TestCase):
-#    @metrics("foo.1.bar", "foo.2.bar", "foo.3.bar")
-#    def test_implicit_exclude_list(self):
-#        metric = {
-#            "foo.*.bar": {
-#                "exclude": {0: ['1', '2']}
-#            }
-#        }
-#        result = fullerene.expand_metric(metric)
-#        assert result == ["foo.3.bar"]
-#
-#    @metrics("foo.1.2", "foo.1.1", "foo.3.1")
-#    def test_implicit_exclude_list_applies_to_first_wildcard_only(self):
-#        metric = {
-#            "foo.*.*": {
-#                "exclude": ['1']
-#            }
-#        }
-#        result = fullerene.expand_metric(metric)
-#        assert result == ["foo.3.1"]
-#
-#    @metrics("foo.1.bar", "foo.2.bar", "foo.3.bar")
-#    def test_explicit_exclude_list(self):
-#        metric = {
-#            "foo.*.bar": {
-#                "exclude": {
-#                    0: ['1', '2']
-#                }
-#            }
-#        }
-#        result = fullerene.expand_metric(metric)
-#        assert result == ["foo.3.bar"]
-#
-#    @metrics(
-#        # Doesn't match any excludes
-#        "foo.2.bar.biz.baz",
-#        # Matches exclude in 1st wildcard slot
-#        "foo.1.2.3.4",
-#        # Matches exclude in 3rd wildcard slot
-#        "foo.bar.biz.2.bar"
-#    )
-#    def test_explicit_exclude_list_multiple_wildcards(self):
-#        metric = {
-#            "foo.*.bar.*.*": {
-#                "exclude": {
-#                    0: ['1'],
-#                    2: ["bar"]
-#                }
-#            }
-#        }
-#        result = fullerene.expand_metric(metric)
-#        assert result == ["foo.2.bar.biz.baz"]
-
-
-class TestPaths(TestCase):
     def test_combinations(self):
         for desc, inputs, results in (
             ("Single metric, no combinations",
@@ -91,10 +62,15 @@ class TestPaths(TestCase):
         # Remember that expansion indexes apply only to wildcard slots,
         # which here are slots which differ from path to path and would thus
         # get combined by default.
-        result = combine(["foo.bar", "foo.biz"], expansions=[1])
-        assert result == ["foo.bar", "foo.biz"]
-        result = combine(["1.2", "3.4"], expansions=[0, 1])
-        assert set(result) == set(["1.2", "3.4", "1.4", "3.2"])
+        for desc, inputs, expansions, results in (
+            ("Expand second part",
+                ["foo.bar", "foo.biz"], [1], ["foo.bar", "foo.biz"]),
+            ("Expand both parts",
+                ["1.2", "3.4"], [0, 1], ["1.2", "3.4", "1.4", "3.2"]),
+        ):
+            eq_.description = desc
+            yield eq_, set(combine(inputs, expansions)), set(results)
+            del eq_.description
 
 
 if __name__ == '__main__':
