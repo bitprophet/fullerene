@@ -55,7 +55,7 @@ class Metric(object):
             if len(struct) > 1:
                 raise ValueError("Found metric value which is a dict but has >1 key! Please make sure your metrics list consists only of strings and one-item dicts.")
             self.path, local_options = struct.items()[0]
-            options = dict(options, **local_options)
+            options = dict(options, **(local_options or {}))
         # Generate split version of our path, and note any wildcards
         self.parts = self.path.split('.')
         self.wildcards = self.find_wildcards()
