@@ -95,23 +95,7 @@ def expand_metric(metric, hostname):
     """
     metric = Metric(metric, graphite)
     # Exclude
-    ret = []
-    for item in metric.expand(hostname):
-        parts = item.split('.')
-        good = True
-        for location, part in enumerate(parts):
-            # We only care about wildcard slots
-            if location not in metric.wildcards:
-                continue
-            # Which wildcard slot is this?
-            wildcard_index = metric.wildcards.index(location)
-            # Is this substring listed for exclusion in this slot?
-            if part in metric.excludes.get(wildcard_index, []):
-                good = False
-                break # move on to next metric/item
-        if good:
-            ret.append(item)
-    return ret
+    return metric.normalize(hostname)
 
 def metrics_for_group(name, hostname):
     raw_metrics = config['metrics'][name]
