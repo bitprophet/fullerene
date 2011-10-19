@@ -25,81 +25,12 @@ graphite = Graphite(config)
 # Helpers/utils
 #
 
-
-
 def groupings():
     return sorted(config['metrics'].keys())
 
-def expand_metric(metric, hostname):
-    """
-    Take metric string or one-key dict and normalize to an iterable as needed.
-
-    Each item in the iterable will be a Graphite metric string mapping to a
-    single graph. These strings themselves may contain wildcards, etc, as
-    defined in the Graphite URL API.
-
-    This function's purpose is to read YAML config metadata and optionally
-    break down a config chunk into >1 Graphite metric string. This allows us to
-    exclude, filter etc without requiring support for new syntax in Graphite.
-
-    String inputs just come out as [metric] (i.e. normalization to list.)
-
-    Dict inputs should have a single string key; basically, mixed strings and
-    dicts should come from YAML that looks like this::
-    
-        metrics:
-            - metric1.foo.bar
-            - metric2.biz.baz
-            - metric3.blah.blah:
-                option: value
-                option2: value2
-            - metric4.whatever
-
-    All "items" under ``metrics`` are metric paths; the difference is that they
-    may optionally have configuration options, which turns that entry into a
-    dict.
-
-    Dict inputs will also come out as at least [metric] (in this case, the
-    single dict key) but config options will often cause multiple metrics to be
-    output, e.g. [metric1, metric2], due to filtering/excluding requiring us to
-    ask Graphite for the full expansion up-front, and then manipulating that
-    result.
-
-    Options currently implemented:
-
-    * ``exclude``: a list of explicit matches to exclude from the first
-      wildcard. E.g. a metric ``df.*.free`` which expands, in Graphite, to
-      [df.root.free, df.mnt.free, df.dev.free, df.dev-shm.free], may be
-      filtered to remove some specific matches like so::
-
-        metrics:
-            - df.*.free: [dev, dev-shm]
-
-      Such a setup would result in a return value from this function of
-      [df.root.free, df.mnt.free] given the expansion example above.
-
-      Note that partial wildcards work the same way; the logic operates based
-      on metric sections (i.e. separated by periods) containing wildcards
-      (meaning asterisks; curly-brace expansion is not considered a wildcard
-      here.)
-
-      If multiple wildcards are given, and the value is still just one list, it
-      will only apply to the first wildcard. To pair specific exclusion lists
-      with specific wildcard positions, use a dict value instead, with numeric
-      keys matching the wildcard positions (0-indexed.) E.g.::
-
-        metrics:
-            - foo.*.bar.*:
-              0: [these, are, excluded, from, 1st, wildcard]
-              1: [these, from, the, 2nd]
-    """
-    metric = Metric(metric, graphite)
-    # Exclude
-    return metric.normalize(hostname)
-
 def metrics_for_group(name, hostname):
     raw_metrics = config['metrics'][name]
-    members = map(lambda x: expand_metric(x, hostname), raw_metrics)
+    members = map(lambda x: Metric(x, graphite).normalize(hostname), raw_metrics)
     merged = reduce(operator.add, members, [])
     return merged
 
