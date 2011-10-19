@@ -73,5 +73,31 @@ class TestMetrics(object):
             del eq_.description
 
 
+class TestConfig(object):
+    def test_required_options(self):
+        """
+        Config files must specify graphite_url
+        """
+        assert False
+
+    def test_metrics(self):
+        """
+        A metrics struct should turn into a dict of Metrics
+        """
+        assert False
+
+    def test_groups(self):
+        """
+        A groups struct should turn into a dict of lists of Metrics
+        """
+        assert False
+
+    def test_metric_aliases(self):
+        """
+        List items in groups collections should honor custom metric names
+        """
+        assert False
+
+
 if __name__ == '__main__':
     main()
