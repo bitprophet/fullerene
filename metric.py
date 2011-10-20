@@ -38,30 +38,27 @@ class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
     """
-    def __init__(self, struct, graphite):
-        """
-        Use ``struct`` to become a metric referring to ``graphite`` backend.
-        """
-        self.graphite = graphite
-        options = {
-            'exclude': [],
-            'expand': [],
-        }
-        # Non-dicts are assumed to be simple stringlike paths
-        if not hasattr(struct, "keys"):
-            self.path = struct
-        # Dicts should have one key only, whose value is a dict of options
-        else:
-            if len(struct) > 1:
-                raise ValueError("Found metric value which is a dict but has >1 key! Please make sure your metrics list consists only of strings and one-item dicts.")
-            self.path, local_options = struct.items()[0]
-            options = dict(options, **(local_options or {}))
+    def __init__(self, path, config, excludes=(), expansions=()):
+        self.path = path
+        self.config = config
         # Generate split version of our path, and note any wildcards
         self.parts = self.path.split('.')
         self.wildcards = self.find_wildcards()
         # Normalize/clean up options
-        self.excludes = self.set_excludes(options['exclude'])
-        self.to_expand = self.set_expansions(options['expand'])
+        self.excludes = self.set_excludes(excludes)
+        self.to_expand = self.set_expansions(expansions)
+
+    def __repr__(self):
+        return "<Metric %r, excluding %r, expanding %r>" % (
+            self.path, self.excludes, self.to_expand
+        )
+
+    def __eq__(self, other):
+        return (
+            self.path == other.path
+            and self.excludes == other.excludes
+            and self.to_expand == other.to_expand
+        )
 
     def find_wildcards(self):
         """
@@ -107,7 +104,7 @@ class Metric(object):
         else:
             path = self.path
             func = lambda x: x
-        return map(func, self.graphite.query(path))
+        return map(func, self.config.graphite.query(path))
 
     def normalize(self, hostname=None):
         """

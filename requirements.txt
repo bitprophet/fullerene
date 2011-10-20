@@ -3,4 +3,4 @@ flask
 pyyaml
 mock
 nose
-rudolf
+-e git+https://github.com/bitprophet/rudolf#egg=rudolf

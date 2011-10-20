@@ -1,0 +1,17 @@
+graphite_url: x
+metrics:
+  implicit:
+    path: foo.*.bar
+    exclude: ["1", "2"]
+  implicit_1st:
+    path: foo.*.*
+    exclude: ["1"]
+  explicit:
+    path: foo.*.bar
+    exclude:
+      0: ["1", "2"]
+  explicit_multiple:
+    path: foo.*.bar.*.*
+    exclude:
+      0: ["1"]
+      2: [bar]

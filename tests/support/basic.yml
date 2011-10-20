@@ -1,0 +1,12 @@
+graphite_url: whatever
+metrics:
+  metric1:
+    path: foo.bar
+  metric2:
+    path: biz.baz
+groups:
+  group1:
+    - raw.path
+    - metric1
+  group2:
+    - metric1

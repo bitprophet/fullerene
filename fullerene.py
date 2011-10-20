@@ -7,6 +7,7 @@ import yaml
 
 from metric import Metric
 from graphite import Graphite
+from config import Config
 
 
 #
@@ -15,7 +16,7 @@ from graphite import Graphite
 
 CONFIG = "config.yml"
 with open(CONFIG) as fd:
-    config = yaml.load(fd)
+    config = Config(fd.read())
 
 app = flask.Flask(__name__)
 graphite = Graphite(config)
@@ -26,10 +27,10 @@ graphite = Graphite(config)
 #
 
 def groupings():
-    return sorted(config['metrics'].keys())
+    return sorted(config['groups'].keys())
 
 def metrics_for_group(name, hostname):
-    raw_metrics = config['metrics'][name]
+    raw_metrics = config['groups'][name]
     members = map(lambda x: Metric(x, graphite).normalize(hostname), raw_metrics)
     merged = reduce(operator.add, members, [])
     return merged

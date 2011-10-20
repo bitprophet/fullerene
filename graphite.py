@@ -8,8 +8,9 @@ class Graphite(object):
 
     Mostly used for querying API endpoints under /metrics/.
     """
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, uri, exclude_hosts=[]):
+        self.uri = uri
+        self.exclude_hosts = []
 
     def query(self, *paths, **kwargs):
         """
@@ -20,13 +21,13 @@ class Graphite(object):
         Specify ``leaves_only=True`` to filter out any non-leaf results.
         """
         query = "?" + "&".join(map(lambda x: "query=%s" % x, paths))
-        url = self.config['graphite_url'] + "/metrics/expand/%s" % query
+        url = self.uri + "/metrics/expand/%s" % query
         if kwargs.get('leaves_only', False):
             url += "&leavesOnly=1"
         response = requests.get(url)
         struct = json.loads(response.content)['results']
         filtered = filter(
-            lambda x: x not in self.config['hosts']['exclude'],
+            lambda x: x not in self.exclude_hosts,
             struct
         )
         return filtered
