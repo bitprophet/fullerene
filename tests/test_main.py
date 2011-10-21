@@ -136,6 +136,13 @@ class TestConfig(object):
         aliased_metric = config.groups['group1']['metric1']
         eq_(aliased_metric.path, "foo.bar")
 
+    def test_default_graph_args(self):
+        """
+        A 'defaults' struct should be added as-is, as an attribute.
+        """
+        config = Config(conf("basic"))
+        eq_(config.defaults, {"height": 250, "width": 400, "from": "-2hours"})
+
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,8 @@
 graphite_url: whatever
+defaults:
+  height: 250
+  width: 400
+  from: -2hours
 metrics:
   metric1:
     path: foo.bar

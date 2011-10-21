@@ -35,3 +35,5 @@ class Config(object):
                 else:
                     new_metric = Metric(path=item, config=self)
                 self.groups[name][item] = new_metric
+        # Default graph args
+        self.defaults = config.get('defaults', {})
