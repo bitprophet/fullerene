@@ -98,6 +98,12 @@ class TestConfig(object):
         """
         Config(conf("no_url"))
 
+    def test_graphite_url(self):
+        """
+        Graphite URI access: config_obj.graphite.uri
+        """
+        eq_(Config(conf("basic")).graphite.uri, "whatever")
+
     def test_metrics(self):
         """
         A metrics struct should turn into a dict of Metrics
