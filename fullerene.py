@@ -98,6 +98,6 @@ def grouping(hostname, group):
 
 @app.route('/render/')
 def render():
-    url = config['graphite_url'] + "/render/"
-    response = requests.get(url, params=flask.request.args)
+    uri = config.graphite.uri + "/render/"
+    response = requests.get(uri, params=flask.request.args)
     return flask.Response(response=response.raw, headers=response.headers)

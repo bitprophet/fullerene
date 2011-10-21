@@ -94,11 +94,11 @@ class TestConfig(object):
     @raises(ValueError)
     def test_required_options(self):
         """
-        Config files must specify graphite_url
+        Config files must specify graphite_uri
         """
         Config(conf("no_url"))
 
-    def test_graphite_url(self):
+    def test_graphite_uri(self):
         """
         Graphite URI access: config_obj.graphite.uri
         """

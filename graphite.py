@@ -21,10 +21,10 @@ class Graphite(object):
         Specify ``leaves_only=True`` to filter out any non-leaf results.
         """
         query = "?" + "&".join(map(lambda x: "query=%s" % x, paths))
-        url = self.uri + "/metrics/expand/%s" % query
+        uri = self.uri + "/metrics/expand/%s" % query
         if kwargs.get('leaves_only', False):
-            url += "&leavesOnly=1"
-        response = requests.get(url)
+            uri += "&leavesOnly=1"
+        response = requests.get(uri)
         struct = json.loads(response.content)['results']
         filtered = filter(
             lambda x: x not in self.exclude_hosts,

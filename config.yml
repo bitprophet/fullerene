@@ -1,4 +1,4 @@
-graphite_url: http://localhost:8081
+graphite_uri: http://localhost:8081
 hosts:
   exclude:
     - carbon

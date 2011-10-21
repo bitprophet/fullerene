@@ -10,9 +10,9 @@ class Config(object):
         config = yaml.load(text)
         # Required items
         try:
-            self.graphite = Graphite(config['graphite_url'])
+            self.graphite = Graphite(uri=config['graphite_uri'])
         except KeyError:
-            raise ValueError, "Configuration must specify graphite_url"
+            raise ValueError, "Configuration must specify graphite_uri"
         # 'metrics' section
         self.metrics = {}
         for name, options in config.get('metrics', {}).iteritems():
