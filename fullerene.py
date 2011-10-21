@@ -29,8 +29,8 @@ def groupings():
     return sorted(config.groups.keys())
 
 def metrics_for_group(name, hostname):
-    raw_metrics = config.groups[name]
-    members = map(lambda x: Metric(x, config).normalize(hostname), raw_metrics)
+    raw_metrics = config.groups[name].values()
+    members = map(lambda x: x.normalize(hostname), raw_metrics)
     merged = reduce(operator.add, members, [])
     return merged
 
