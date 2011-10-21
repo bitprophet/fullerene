@@ -11,12 +11,12 @@ from config import Config
 def conf(name):
     here = os.path.dirname(__file__)
     with open(os.path.join(here, "support", name + ".yml")) as fd:
-        return fd.read()
+        return Config(fd.read())
 
 
 class TestMetrics(object):
     def test_exclusions(self):
-        config = Config(conf("exclusions"))
+        config = conf("exclusions")
         for desc, name, expansions, result in (
             ("Implicit exclude list",
                 "implicit",
@@ -96,13 +96,13 @@ class TestConfig(object):
         """
         Config files must specify graphite_uri
         """
-        Config(conf("no_url"))
+        conf("no_url")
 
     def test_graphite_uri(self):
         """
         Graphite URI access: config_obj.graphite.uri
         """
-        eq_(Config(conf("basic")).graphite.uri, "whatever")
+        eq_(conf("basic").graphite.uri, "whatever")
 
     def test_metrics(self):
         """
@@ -114,8 +114,8 @@ class TestConfig(object):
             "metric1": metric1,
             "metric2": metric2
         }
-        cmp_metrics(Config(conf("basic")).metrics, metrics)
-        eq_(Config(conf("basic")).metrics, metrics)
+        cmp_metrics(conf("basic").metrics, metrics)
+        eq_(conf("basic").metrics, metrics)
 
     def test_groups(self):
         """
@@ -130,7 +130,7 @@ class TestConfig(object):
                 "metric1": Metric("foo.bar", mock.Mock())
             }
         }
-        config = Config(conf("basic"))
+        config = conf("basic")
         for name, metrics in config.groups.items():
             cmp_metrics(metrics, groups[name])
 
@@ -138,7 +138,7 @@ class TestConfig(object):
         """
         List items in groups collections should honor custom metric names
         """
-        config = Config(conf("basic"))
+        config = conf("basic")
         aliased_metric = config.groups['group1']['metric1']
         eq_(aliased_metric.path, "foo.bar")
 
@@ -146,21 +146,21 @@ class TestConfig(object):
         """
         A 'defaults' struct should be added as-is, as an attribute.
         """
-        config = Config(conf("basic"))
+        config = conf("basic")
         eq_(config.defaults, {"height": 250, "width": 400, "from": "-2hours"})
 
     def test_exclude_hosts(self):
         """
         config['hosts']['exclude'] should become config.graphite.exclude_hosts
         """
-        config = Config(conf("basic"))
+        config = conf("basic")
         eq_(config.graphite.exclude_hosts, ['a', 'b'])
 
     def test_periods(self):
         """
         config['periods'] => config.periods
         """
-        config = Config(conf("basic"))
+        config = conf("basic")
         eq_(config.periods, {'day': '-24hours', 'week': '-7days'})
 
 
