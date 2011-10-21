@@ -44,3 +44,5 @@ class Config(object):
                 self.groups[name][item] = new_metric
         # Default graph args
         self.defaults = config.get('defaults', {})
+        # Timeperiod aliases
+        self.periods = config.get('periods', {})

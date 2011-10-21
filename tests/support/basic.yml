@@ -3,6 +3,9 @@ hosts:
   exclude:
     - a
     - b
+periods:
+  day: -24hours
+  week: -7days
 defaults:
   height: 250
   width: 400

@@ -156,6 +156,13 @@ class TestConfig(object):
         config = Config(conf("basic"))
         eq_(config.graphite.exclude_hosts, ['a', 'b'])
 
+    def test_periods(self):
+        """
+        config['periods'] => config.periods
+        """
+        config = Config(conf("basic"))
+        eq_(config.periods, {'day': '-24hours', 'week': '-7days'})
+
 
 if __name__ == '__main__':
     main()
