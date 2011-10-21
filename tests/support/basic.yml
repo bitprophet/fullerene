@@ -1,4 +1,8 @@
 graphite_uri: whatever
+hosts:
+  exclude:
+    - a
+    - b
 defaults:
   height: 250
   width: 400

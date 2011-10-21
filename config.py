@@ -10,7 +10,14 @@ class Config(object):
         config = yaml.load(text)
         # Required items
         try:
-            self.graphite = Graphite(uri=config['graphite_uri'])
+            try:
+                exclude_hosts = config['hosts']['exclude']
+            except KeyError:
+                exclude_hosts = []
+            self.graphite = Graphite(
+                uri=config['graphite_uri'],
+                exclude_hosts=exclude_hosts
+            )
         except KeyError:
             raise ValueError, "Configuration must specify graphite_uri"
         # 'metrics' section

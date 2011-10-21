@@ -149,6 +149,13 @@ class TestConfig(object):
         config = Config(conf("basic"))
         eq_(config.defaults, {"height": 250, "width": 400, "from": "-2hours"})
 
+    def test_exclude_hosts(self):
+        """
+        config['hosts']['exclude'] should become config.graphite.exclude_hosts
+        """
+        config = Config(conf("basic"))
+        eq_(config.graphite.exclude_hosts, ['a', 'b'])
+
 
 if __name__ == '__main__':
     main()
