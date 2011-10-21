@@ -23,28 +23,28 @@ class TestMetrics(object):
                 ("foo.1.bar", "foo.2.bar", "foo.3.bar"),
                 "foo.3.bar"
             ),
-            #("Implicit exclude list applied only to 1st wildcard",
-            #    "implicit_1st",
-            #    ("foo.1.2", "foo.1.1", "foo.3.1"),
-            #    "foo.3.1"
-            #),
-            #("Explicit exclude list",
-            #    "explicit",
-            #    ("foo.1.bar", "foo.2.bar", "foo.3.bar"),
-            #    "foo.3.bar"
-            #),
-            #("Explicit exclude list, multiple wildcards",
-            #    "explicit_multiple",
-            #    (
-            #        # Doesn't match any excludes
-            #        "foo.2.bar.biz.baz",
-            #        # Matches exclude in 1st wildcard slot
-            #        "foo.1.2.3.4",
-            #        # Matches exclude in 3rd wildcard slot
-            #        "foo.bar.biz.2.bar"
-            #    ),
-            #    "foo.2.bar.biz.baz"
-            #),
+            ("Implicit exclude list applied only to 1st wildcard",
+                "implicit_1st",
+                ("foo.1.2", "foo.1.1", "foo.3.1"),
+                "foo.3.1"
+            ),
+            ("Explicit exclude list",
+                "explicit",
+                ("foo.1.bar", "foo.2.bar", "foo.3.bar"),
+                "foo.3.bar"
+            ),
+            ("Explicit exclude list, multiple wildcards",
+                "explicit_multiple",
+                (
+                    # Doesn't match any excludes
+                    "foo.2.bar.biz.baz",
+                    # Matches exclude in 1st wildcard slot
+                    "foo.1.2.3.4",
+                    # Matches exclude in 3rd wildcard slot
+                    "foo.bar.biz.2.bar"
+                ),
+                "foo.2.bar.biz.baz"
+            ),
         ):
             graphite = mock.Mock()
             graphite.query.return_value = expansions
