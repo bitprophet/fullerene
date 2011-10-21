@@ -25,7 +25,7 @@ groups:
     - memory.memory.free.value
   disk:
     - free_disk_space
-    - disk.{xvda1,xvdb,xvdf}.disk_octets.{read,write}:
+    - disk.{xvda1,xvdb,xvdf}.disk_octets.{read,write}
   cpu:
     - load.load.*
   network:

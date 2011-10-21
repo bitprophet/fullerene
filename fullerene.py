@@ -19,7 +19,6 @@ with open(CONFIG) as fd:
     config = Config(fd.read())
 
 app = flask.Flask(__name__)
-graphite = Graphite(config)
 
 
 #
@@ -27,11 +26,11 @@ graphite = Graphite(config)
 #
 
 def groupings():
-    return sorted(config['groups'].keys())
+    return sorted(config.groups.keys())
 
 def metrics_for_group(name, hostname):
-    raw_metrics = config['groups'][name]
-    members = map(lambda x: Metric(x, graphite).normalize(hostname), raw_metrics)
+    raw_metrics = config.groups[name]
+    members = map(lambda x: Metric(x, config).normalize(hostname), raw_metrics)
     merged = reduce(operator.add, members, [])
     return merged
 
@@ -54,7 +53,7 @@ def _render(hostname, metric, **overrides):
     Also sets a default 'title' kwarg to metric + period/from.
     """
     # Merge with defaults from config
-    kwargs = dict(config['defaults'], **overrides)
+    kwargs = dict(config.defaults, **overrides)
     # Set a default (runtime) title
     if 'title' not in kwargs:
         kwargs['title'] = "%s (%s)" % (metric, kwargs['from'])
@@ -74,7 +73,7 @@ def _render(hostname, metric, **overrides):
 
 @app.route('/')
 def index():
-    hosts = graphite.query("*")
+    hosts = config.graphite.query("*")
     domains = defaultdict(list)
     for host in hosts:
         name, _, domain = host.partition('_')
