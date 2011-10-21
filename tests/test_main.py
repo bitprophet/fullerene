@@ -89,6 +89,12 @@ def cmp_metrics(dict1, dict2):
     for metricname, metric in dict1.items():
         eq_(dict2[metricname], metric)
 
+def recursive_getattr(obj, attr_list=()):
+    value = getattr(obj, attr_list[0])
+    try:
+        return recursive_getattr(value, attr_list[1:])
+    except IndexError:
+        return value
 
 class TestConfig(object):
     @raises(ValueError)
@@ -98,11 +104,20 @@ class TestConfig(object):
         """
         conf("no_url")
 
-    def test_graphite_uri(self):
+    def test_basic_attributes(self):
         """
-        Graphite URI access: config_obj.graphite.uri
+        Attributes which are straight-up imported from the YAML
         """
-        eq_(conf("basic").graphite.uri, "whatever")
+        for attr, expected in (
+            ('defaults', {'height': 250, 'width': 400, 'from': '-2hours'}),
+            ('periods', {'day': '-24hours', 'week': '-7days'}),
+            ('graphite.uri', 'whatever'),
+            ('graphite.exclude_hosts', ['a', 'b']),
+        ):
+            eq_.description = "Config.%s = YAML '%s' value" % (attr, attr)
+            result = recursive_getattr(conf("basic"), attr.split('.'))
+            yield eq_, result, expected
+            del eq_.description
 
     def test_metrics(self):
         """
@@ -141,27 +156,6 @@ class TestConfig(object):
         config = conf("basic")
         aliased_metric = config.groups['group1']['metric1']
         eq_(aliased_metric.path, "foo.bar")
-
-    def test_default_graph_args(self):
-        """
-        A 'defaults' struct should be added as-is, as an attribute.
-        """
-        config = conf("basic")
-        eq_(config.defaults, {"height": 250, "width": 400, "from": "-2hours"})
-
-    def test_exclude_hosts(self):
-        """
-        config['hosts']['exclude'] should become config.graphite.exclude_hosts
-        """
-        config = conf("basic")
-        eq_(config.graphite.exclude_hosts, ['a', 'b'])
-
-    def test_periods(self):
-        """
-        config['periods'] => config.periods
-        """
-        config = conf("basic")
-        eq_(config.periods, {'day': '-24hours', 'week': '-7days'})
 
 
 if __name__ == '__main__':
