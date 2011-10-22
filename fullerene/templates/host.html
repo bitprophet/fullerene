@@ -7,21 +7,31 @@
             <strong><a href="{{ url_for('index') }}">&laquo; all hosts</a></strong>
             |
             {% for group in groupings %}
-                {% if group == current %}
+                {% if group == current_group %}
                     <strong>{{ group }}</strong>
                 {% else %}
-                    <a href="{{ url_for('grouping', group=group, hostname=hostname) }}">{{ group }}</a>
+                    <a href="{{ url_for('grouping', group=group, hostname=hostname, period=current_period) }}">{{ group }}</a>
                 {% endif %}
                 {% if not loop.last %}|{% endif %}
             {% endfor %}
         </p>
+        <p>
+        {% for period in periods %}
+            {% if period == current_period %}
+                <strong>{{ period }}</strong>
+            {% else %}
+                <a href="{{ url_for('grouping', group=current_group, period=period, hostname=hostname) }}">{{ period }}</a>
+            {% endif %}
+            {% if not loop.last %}|{% endif %}
+        {% endfor %}
+        </p>
     </div>
 </div>
-{% for metric in metrics %}
+{% for tuple in metrics|batch(2) %}
 <div class="row">
-    {% for period in ('day', 'week') %}
+    {% for metric in tuple %}
     <div class="span7">
-        <p><img src="{{ hostname|render(metric, from=period) }}" /></p>
+        <p><img src="{{ hostname|render(metric, from=current_period) }}" /></p>
     </div>
     {% endfor %}
 </div>

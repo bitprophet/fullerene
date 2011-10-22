@@ -85,14 +85,16 @@ def index():
         groupings=groupings()
     )
 
-@app.route('/hosts/<hostname>/<group>/')
-def grouping(hostname, group):
+@app.route('/hosts/<hostname>/<group>/<period>/')
+def grouping(hostname, group, period):
     return flask.render_template(
         'host.html',
         hostname=hostname,
         metrics=metrics_for_group(group, hostname),
         groupings=groupings(),
-        current=group,
+        periods=config.periods.keys(),
+        current_group=group,
+        current_period=period
     )
 
 @app.route('/render/')
