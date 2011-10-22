@@ -1,11 +1,13 @@
+import sys
+
 import os.path
 
 import mock
 from nose.tools import eq_, raises
 from nose.plugins.skip import SkipTest
 
-from metric import Metric, combine
-from config import Config
+from fullerene.metric import Metric, combine
+from fullerene.config import Config
 
 
 def conf(name):
