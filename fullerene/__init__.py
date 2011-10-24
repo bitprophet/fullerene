@@ -1,5 +1,6 @@
 from collections import defaultdict
 import operator
+import os
 
 import requests
 import flask
@@ -14,7 +15,7 @@ from config import Config
 # Set up globals
 #
 
-CONFIG = "config.yml"
+CONFIG = os.path.join(os.path.dirname(__file__), "..", "config.yml")
 with open(CONFIG) as fd:
     config = Config(fd.read())
 
