@@ -52,7 +52,7 @@ class TestMetrics(object):
             graphite.query.return_value = expansions
             with mock.patch.object(config, 'graphite', graphite):
                 eq_.description = desc
-                yield eq_, config.metrics[name].normalize(), [result]
+                yield eq_, map(str, config.metrics[name].normalize()), [result]
                 del eq_.description
 
     def test_combinations(self):
@@ -69,7 +69,7 @@ class TestMetrics(object):
                 ("foo.name.bar", "biz.name.baz"), "{foo,biz}.name.{bar,baz}"),
         ):
             eq_.description = desc
-            yield eq_, combine(inputs), [results]
+            yield eq_, map(str, combine(inputs)), [results]
             del eq_.description
 
     def test_expansions(self):
@@ -83,7 +83,7 @@ class TestMetrics(object):
                 ["1.2", "3.4"], [0, 1], ["1.2", "3.4", "1.4", "3.2"]),
         ):
             eq_.description = desc
-            yield eq_, set(combine(inputs, expansions)), set(results)
+            yield eq_, set(map(str, combine(inputs, expansions))), set(results)
             del eq_.description
 
 
