@@ -2,34 +2,63 @@ from collections import defaultdict
 from types import StringTypes
 
 
-def combine(paths, expansions=[]):
+def combine(paths, expansions=[], include_raw=False):
     """
     Take a list of paths and combine into fewer using brace-expressions.
 
     E.g. ["foo.bar", "foo.biz"] => "foo.{bar,biz}"
+
+    When ``include_raw`` is ``True``, returns list of two-tuples where tuple[0]
+    is the brace-expression and tuple[1] is the individual full paths making up
+    that particular brace-expression. (Which, with no expansion, will always be
+    the same as the input list; with expansion it's usually a subset.)
+
+    With expansions & include_raw, you'd get e.g. [("foo.bar", ["foo.bar"]),
+    ("foo.biz", ["foo.biz"])] for the same input as above and an expansion list
+    of [1].
+
+    A more complex example would be partial expansion. Calling
+    combine(["a.1.b.1", "a.1.b.2", "a.2.b.1", "a.2.b.2"], expansions=[1],
+    include_raw=True) would result in:
+
+        [
+            ("a.1.b.{1,2}", ["a.1.b.1", "a.1.b.2"]),
+            ("a.2.b.{1,2}", ["a.2.b.1", "a.2.b.2"])
+        ]
+
+    because the first "overlapping" segment (a.1 vs a.2) is expanded, but the
+    second (b.1 vs b.2) is not, and thus we get two 2-tuples whose 2nd
+    components split the incoming 4-item list in half.
     """
     buckets = defaultdict(list)
+    # Divvy up paths into per-segment buckets
     for path in paths:
         for i, part in enumerate(path.split('.')):
             if part not in buckets[i]:
                 buckets[i].append(part)
+    # "Zip" up buckets as needed depending on expansions
     ret = [[]]
     for key in sorted(buckets.keys()):
         value = list(buckets[key])
+        # Only one value for this index: everybody gets a copy
         if len(value) == 1:
             for x in ret:
                 x.append(value[0])
         else:
+            # If this index is to be expanded, branch out: all existing results
+            # up to this point get cloned, one per matching item
             if key in expansions:
                 previous = ret[:]
                 ret = []
                 for x in value:
                     for y in previous:
                         ret.append(y + [x])
+            # No expansion = make it a brace sub-expression string.
             else:
                 joined = "{" + ",".join(value) + "}"
                 for x in ret:
                     x.append(joined)
+    # Now that we're done, merge the chains into strings.
     result = map(lambda x: '.'.join(x), ret)
     return result
 

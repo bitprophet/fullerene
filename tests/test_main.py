@@ -86,6 +86,20 @@ class TestMetrics(object):
             yield eq_, set(map(str, combine(inputs, expansions))), set(results)
             del eq_.description
 
+    def test_include_raw_expansions(self):
+        """
+        combine(include_raw=True) with expansions
+        """
+        result = combine(["foo.bar", "foo.biz"], [1], True)
+        eq_(result, [("foo.bar", ["foo.bar"]), ("foo.biz", ["foo.biz"])])
+
+    def test_include_raw_no_expansions(self):
+        """
+        combine(include_raw=True) without expansions
+        """
+        result = combine(["foo.bar", "foo.biz"], [], True)
+        eq_(result, [("foo.{bar,biz}", ["foo.bar", "foo.biz"])])
+
 
 def cmp_metrics(dict1, dict2):
     for metricname, metric in dict1.items():
