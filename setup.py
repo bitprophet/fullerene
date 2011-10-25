@@ -11,5 +11,5 @@ setup(
     packages=find_packages(),
     #test_suite='nose.collector',
     tests_require=['nose', 'mock', 'rudolf'],
-    install_requires=['requests', 'flask', 'pyyaml'],
+    install_requires=['requests >=0.7.3', 'flask', 'pyyaml'],
 )
