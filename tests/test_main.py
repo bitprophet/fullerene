@@ -91,14 +91,27 @@ class TestMetrics(object):
         combine(include_raw=True) with expansions
         """
         result = combine(["foo.bar", "foo.biz"], [1], True)
-        eq_(result, [("foo.bar", ["foo.bar"]), ("foo.biz", ["foo.biz"])])
+        eq_(result, {"foo.bar": ["foo.bar"], "foo.biz": ["foo.biz"]})
 
     def test_include_raw_no_expansions(self):
         """
         combine(include_raw=True) without expansions
         """
         result = combine(["foo.bar", "foo.biz"], [], True)
-        eq_(result, [("foo.{bar,biz}", ["foo.bar", "foo.biz"])])
+        eq_(result, {"foo.{bar,biz}": ["foo.bar", "foo.biz"]})
+
+    def test_include_raw_complex(self):
+        """
+        combine(include_raw=True) with complex input
+        """
+        paths = ["a.1.b.1", "a.1.b.2", "a.2.b.1", "a.2.b.2"]
+        result = combine(paths, [3], True)
+        eq_(result,
+            {
+                "a.{1,2}.b.1": ["a.1.b.1", "a.2.b.1"],
+                "a.{1,2}.b.2": ["a.1.b.2", "a.2.b.2"]
+            }
+        )
 
 
 def cmp_metrics(dict1, dict2):
