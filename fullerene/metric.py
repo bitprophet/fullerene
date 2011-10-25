@@ -34,6 +34,35 @@ def combine(paths, expansions=[]):
     return result
 
 
+class DisplayMetric(object):
+    def __init__(self, path, config):
+        self.path = path
+        self.config = config
+
+    def __str__(self):
+        return self.path
+
+    def render_params(self, hostname, **overrides):
+        """
+        Returns GET param kwargs for rendering this metric on given hostname.
+
+        Designed for use with a 'render' URL endpoint.
+
+        Will filter the 'from' kwarg through config.periods first.  Also sets a
+        default 'title' kwarg to metric + period/from.
+        """
+        # Merge with defaults from config
+        kwargs = dict(self.config.defaults, **overrides)
+        # Set a default (runtime) title
+        if 'title' not in kwargs:
+            kwargs['title'] = "%s (%s)" % (self, kwargs['from'])
+        # Translate period names in 'from' kwarg if needed
+        f = kwargs['from']
+        kwargs['from'] = self.config.periods.get(f, f)
+        kwargs['target'] = "%s.%s" % (hostname, self.path)
+        return kwargs
+
+
 class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
@@ -108,7 +137,7 @@ class Metric(object):
 
     def normalize(self, hostname=None):
         """
-        Return a list of one or more metric paths based on our options.
+        Return a list of one or more sub-metrics based on our options.
 
         For example, a basic ``Metric("foo.*")`` with no options would
         normalize into simply ``["foo.*"]``. ``Metric("foo.*", {'exclude':
@@ -116,6 +145,8 @@ class Metric(object):
         again, and return e.g. ``["foo.{3,4,5}]``. And ``Metric("foo.*",
         {'expand': 'true'})`` would cause full expansion, returning e.g.
         ``["foo.1", "foo.2", "foo.3", ...]``.
+
+        These sub-metrics are represented as rich string-like objects.
         """
         # Not applying any filters == just the path
         if not self.excludes:
@@ -138,5 +169,6 @@ class Metric(object):
             if good:
                 matches.append(item)
         # Perform any necessary combining into brace-expressions & return
-        return combine(matches, self.to_expand)
+        result = combine(matches, self.to_expand)
+        return map(lambda x: DisplayMetric(x, self.config), result)
 

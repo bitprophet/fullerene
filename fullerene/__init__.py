@@ -45,27 +45,12 @@ def dots(s):
     return s.replace('_', '.')
 
 @app.template_filter('render')
-def _render(hostname, metric, **overrides):
+def _render(metric, hostname, **overrides):
     """
-    Use: {{ hostname|render(metric, from='-2hours', height=400, ...) }}
-
-    Will filter the 'from' kwarg through config.periods first.
-
-    Also sets a default 'title' kwarg to metric + period/from.
+    Takes a DisplayMetric as input, prints out full render URL
     """
-    # Merge with defaults from config
-    kwargs = dict(config.defaults, **overrides)
-    # Set a default (runtime) title
-    if 'title' not in kwargs:
-        kwargs['title'] = "%s (%s)" % (metric, kwargs['from'])
-    # Translate period names in 'from' kwarg if needed
-    f = kwargs['from']
-    kwargs['from'] = config.periods.get(f, f)
-    return flask.url_for(
-        'render',
-        target="%s.%s" % (hostname, metric),
-        **kwargs
-    )
+    params = metric.render_params(hostname, **overrides)
+    return flask.url_for("render", **params)
 
 
 #

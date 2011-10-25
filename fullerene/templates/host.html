@@ -32,7 +32,7 @@
 <div class="row">
     {% for metric in tuple %}
     <div class="span7">
-        <p><img src="{{ hostname|render(metric, from=current_period) }}" /></p>
+        <p><img src="{{ metric|render(hostname, from=current_period) }}" /></p>
     </div>
     {% endfor %}
 </div>
