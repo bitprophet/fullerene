@@ -66,7 +66,7 @@ def combine(paths, expansions=[], include_raw=False):
         key_parts = []
         paths = [[]]
         for part in expr:
-            if not isinstance(part, str):
+            if isinstance(part, list):
                 # Update paths
                 previous = paths[:]
                 paths = []
