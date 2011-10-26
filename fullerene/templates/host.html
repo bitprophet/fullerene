@@ -28,13 +28,20 @@
         </p>
     </div>
 </div>
-{% for tuple in metrics|batch(2) %}
+{% for metric in metrics %}
 <div class="row">
-    {% for metric in tuple %}
     <div class="span7">
         <p><img src="{{ metric|render(hostname, from=current_period) }}" /></p>
     </div>
+    <div class="span7">
+        <ul>
+    {% for stat in metric.children %}
+    {#<li>{{ stat }} | min: {{ stat.min(hostname) }} | mean: {{ stat.mean }} |
+    max: {{ stat.max }}</li>$#}
+    <li>{{ stat }}: {{ stat.stats(hostname) }}</li>
     {% endfor %}
+</ul>
+    </div>
 </div>
 {% endfor %}
 {% endblock %}

@@ -32,6 +32,20 @@ class Graphite(object):
         )
         return filtered
 
+    def stats(self, kwargs):
+        kwargs['rawData'] = 'true'
+        uri = "%s/render/" % self.uri
+        result = requests.get(uri, params=kwargs).content.strip().split('|')[1]
+        values = map(
+            lambda x: float(x),
+            filter(lambda x: x != 'None', result.split(','))
+        )
+        return {
+            'min': min(values),
+            'max': max(values),
+            'avg': sum(values) / len(values)
+        }
+
     def query_all(base, max_depth=7):
         """
         Return *all* metrics starting with the given ``base`` pattern/string.

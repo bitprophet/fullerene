@@ -85,12 +85,19 @@ def combine(paths, expansions=[], include_raw=False):
 
 
 class DisplayMetric(object):
-    def __init__(self, path, config):
+    def __init__(self, path, config, children=None):
+        children = children or []
         self.path = path
+        self.children = map(lambda x: DisplayMetric(x, config), children)
         self.config = config
 
     def __str__(self):
         return self.path
+
+    def __repr__(self):
+        return "<DisplayMetric %r: %r>" % (
+            str(self), self.children
+        )
 
     def render_params(self, hostname, **overrides):
         """
@@ -111,6 +118,10 @@ class DisplayMetric(object):
         kwargs['from'] = self.config.periods.get(f, f)
         kwargs['target'] = "%s.%s" % (hostname, self.path)
         return kwargs
+
+    def stats(self, hostname, **overrides):
+        params = self.render_params(hostname, **overrides)
+        return self.config.graphite.stats(params)
 
 
 class Metric(object):
@@ -219,6 +230,9 @@ class Metric(object):
             if good:
                 matches.append(item)
         # Perform any necessary combining into brace-expressions & return
-        result = combine(matches, self.to_expand)
-        return map(lambda x: DisplayMetric(x, self.config), result)
+        result = combine(matches, self.to_expand, include_raw=True)
+        return map(
+            lambda x: DisplayMetric(x[0], self.config, x[1]),
+            result.items()
+        )
 
