@@ -31,7 +31,11 @@
 {% for graph in metrics %}
 <div class="row">
     <div class="span7">
-        <p><img src="{{ graph|render }}" /></p>
+        <p>
+        <a href="{{ graph|composer }}" title="Click for Graphite composer">
+            <img src="{{ graph|render }}" />
+        </a>
+        </p>
     </div>
     <div class="span7">
         <ul>

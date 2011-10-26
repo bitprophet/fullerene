@@ -45,6 +45,10 @@ def _render(graph, **overrides):
     """
     return flask.url_for("render", **graph.kwargs)
 
+@app.template_filter('composer')
+def composer(graph):
+    return config.graphite.uri + "/composer/" + graph.querystring
+
 
 #
 # Routes

@@ -40,3 +40,13 @@ class Graph(object):
         return "<Graph %r: %r (%r)>" % (
             str(self), self.children, self.kwargs
         )
+
+    @property
+    def querystring(self):
+        """
+        Prints out query string for easy appending to URLs.
+
+        E.g. "?target=foo&from=blah&height=xxx"
+        """
+        pairs = map(lambda x: "%s=%s" % (x[0], x[1]), self.kwargs.items())
+        return "?" + "&".join(pairs)
