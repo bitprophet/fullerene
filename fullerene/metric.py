@@ -1,6 +1,8 @@
 from collections import defaultdict
 from types import StringTypes
 
+from graph import Graph
+
 
 def combine(paths, expansions=[], include_raw=False):
     """
@@ -84,49 +86,6 @@ def combine(paths, expansions=[], include_raw=False):
     return mapping if include_raw else mapping.keys()
 
 
-class DisplayMetric(object):
-    def __init__(self, path, config, children=None):
-        children = children or []
-        self.path = path
-        self.children = map(lambda x: DisplayMetric(x, config), children)
-        self.config = config
-        self._stats = {}
-
-    def __str__(self):
-        return self.path
-
-    def __repr__(self):
-        return "<DisplayMetric %r: %r>" % (
-            str(self), self.children
-        )
-
-    def render_params(self, hostname, **overrides):
-        """
-        Returns GET param kwargs for rendering this metric on given hostname.
-
-        Designed for use with a 'render' URL endpoint.
-
-        Will filter the 'from' kwarg through config.periods first.  Also sets a
-        default 'title' kwarg to metric + period/from.
-        """
-        # Merge with defaults from config
-        kwargs = dict(self.config.defaults, **overrides)
-        # Set a default (runtime) title
-        if 'title' not in kwargs:
-            kwargs['title'] = "%s (%s)" % (self, kwargs['from'])
-        # Translate period names in 'from' kwarg if needed
-        f = kwargs['from']
-        kwargs['from'] = self.config.periods.get(f, f)
-        kwargs['target'] = "%s.%s" % (hostname, self.path)
-        return kwargs
-
-    def stats(self, hostname, **overrides):
-        if hostname not in self._stats:
-            params = self.render_params(hostname, **overrides)
-            self._stats[hostname] = self.config.graphite.stats(params)
-        return self._stats[hostname]
-
-
 class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
@@ -199,22 +158,22 @@ class Metric(object):
             func = lambda x: x
         return map(func, self.config.graphite.query(path))
 
-    def normalize(self, hostname=None):
+    def graphs(self, hostname=None, **kwargs):
         """
-        Return a list of one or more sub-metrics based on our options.
+        Return 1+ Graph objects, optionally using ``hostname`` for context.
 
-        For example, a basic ``Metric("foo.*")`` with no options would
-        normalize into simply ``["foo.*"]``. ``Metric("foo.*", {'exclude':
-        [1,2]})`` would expand out, remove any matching exclusions, compress
-        again, and return e.g. ``["foo.{3,4,5}]``. And ``Metric("foo.*",
-        {'expand': 'true'})`` would cause full expansion, returning e.g.
-        ``["foo.1", "foo.2", "foo.3", ...]``.
+        Uses the initial ``excludes`` and ``expands`` options to determine
+        which graphs to return. See ``metric.Metric.expand`` and
+        ``metric.combine`` for details.
 
-        These sub-metrics are represented as rich string-like objects.
+        Any kwargs passed in are passed into the Graph objects, so e.g.
+        ``.graphs('foo.hostname', **{'from': '-24hours'})`` is a convenient way
+        to get a collection of graphs for this metric all set to draw a 24 hour
+        period.
+
+        The kwargs will be used to override any defaults from the config
+        object.
         """
-        # Not applying any filters == just the path
-        if not self.excludes:
-            return [self.path]
         # Expand out to full potential list of paths, apply filters
         matches = []
         for item in self.expand(hostname):
@@ -234,8 +193,9 @@ class Metric(object):
                 matches.append(item)
         # Perform any necessary combining into brace-expressions & return
         result = combine(matches, self.to_expand, include_raw=True)
-        return map(
-            lambda x: DisplayMetric(x[0], self.config, x[1]),
-            result.items()
-        )
-
+        tuples = result.iteritems()
+        merged_kwargs = dict(self.config.defaults, **kwargs)
+        return [
+            Graph(hostname, path, subpaths, self.config, **merged_kwargs)
+            for path, subpaths in tuples
+        ]

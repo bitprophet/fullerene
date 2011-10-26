@@ -29,12 +29,6 @@ app = flask.Flask(__name__)
 def groupings():
     return sorted(config.groups.keys())
 
-def metrics_for_group(name, hostname):
-    raw_metrics = config.groups[name].values()
-    members = map(lambda x: x.normalize(hostname), raw_metrics)
-    merged = reduce(operator.add, members, [])
-    return merged
-
 
 #
 # Template filters
@@ -45,12 +39,11 @@ def dots(s):
     return s.replace('_', '.')
 
 @app.template_filter('render')
-def _render(metric, hostname, **overrides):
+def _render(graph, **overrides):
     """
-    Takes a DisplayMetric as input, prints out full render URL
+    Takes a Graph as input, prints out full render URL.
     """
-    params = metric.render_params(hostname, **overrides)
-    return flask.url_for("render", **params)
+    return flask.url_for("render", **graph.kwargs)
 
 
 #
@@ -73,10 +66,17 @@ def index():
 
 @app.route('/hosts/<hostname>/<group>/<period>/')
 def grouping(hostname, group, period):
+    # Get metric objects for this group
+    raw_metrics = config.groups[group].values()
+    # Filter period value through defined aliases
+    kwargs = {'from': config.periods.get(period, period)}
+    # Generate graph objects from each metric, based on hostname context
+    graphs = map(lambda m: m.graphs(hostname, **kwargs), raw_metrics)
+    merged = reduce(operator.add, graphs, [])
     return flask.render_template(
         'host.html',
         hostname=hostname,
-        metrics=metrics_for_group(group, hostname),
+        metrics=merged,
         groupings=groupings(),
         periods=config.periods.keys(),
         current_group=group,

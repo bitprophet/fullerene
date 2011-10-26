@@ -28,17 +28,15 @@
         </p>
     </div>
 </div>
-{% for metric in metrics %}
+{% for graph in metrics %}
 <div class="row">
     <div class="span7">
-        <p><img src="{{ metric|render(hostname, from=current_period) }}" /></p>
+        <p><img src="{{ graph|render }}" /></p>
     </div>
     <div class="span7">
         <ul>
-    {% for stat in metric.children %}
-    <li>{{ stat }} | min: {{ stat.stats(hostname)['min'] }} | mean: {{
-    stat.stats(hostname)['mean'] }} |
-    max: {{ stat.stats(hostname)['max'] }}</li>
+    {% for stat in graph.children %}
+    <li>{{ stat }} &raquo; min: {{ stat.min }} | mean: {{ stat.mean }} | max: {{ stat.max }}</li>
     {% endfor %}
 </ul>
     </div>
