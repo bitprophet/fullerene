@@ -90,6 +90,7 @@ class DisplayMetric(object):
         self.path = path
         self.children = map(lambda x: DisplayMetric(x, config), children)
         self.config = config
+        self._stats = {}
 
     def __str__(self):
         return self.path
@@ -120,8 +121,10 @@ class DisplayMetric(object):
         return kwargs
 
     def stats(self, hostname, **overrides):
-        params = self.render_params(hostname, **overrides)
-        return self.config.graphite.stats(params)
+        if hostname not in self._stats:
+            params = self.render_params(hostname, **overrides)
+            self._stats[hostname] = self.config.graphite.stats(params)
+        return self._stats[hostname]
 
 
 class Metric(object):

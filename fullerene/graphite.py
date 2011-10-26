@@ -43,7 +43,7 @@ class Graphite(object):
         return {
             'min': min(values),
             'max': max(values),
-            'avg': sum(values) / len(values)
+            'mean': sum(values) / len(values)
         }
 
     def query_all(base, max_depth=7):

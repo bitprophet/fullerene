@@ -36,9 +36,9 @@
     <div class="span7">
         <ul>
     {% for stat in metric.children %}
-    {#<li>{{ stat }} | min: {{ stat.min(hostname) }} | mean: {{ stat.mean }} |
-    max: {{ stat.max }}</li>$#}
-    <li>{{ stat }}: {{ stat.stats(hostname) }}</li>
+    <li>{{ stat }} | min: {{ stat.stats(hostname)['min'] }} | mean: {{
+    stat.stats(hostname)['mean'] }} |
+    max: {{ stat.stats(hostname)['max'] }}</li>
     {% endfor %}
 </ul>
     </div>
