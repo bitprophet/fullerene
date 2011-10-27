@@ -79,7 +79,7 @@ def collection(collection):
     collections = dict(config.collections, by_domain=by_domain)
     try:
         return flask.render_template(
-            'hostlist.html',
+            'collection.html',
             name=collection,
             collection=collections[collection],
             metric_groups=config.metric_groups,
