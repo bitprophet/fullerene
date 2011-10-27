@@ -33,6 +33,8 @@ def combine(paths, expansions=[], include_raw=False):
     second (b.1 vs b.2) is not, and thus we get two keys whose values split the
     incoming 4-item list in half.
     """
+    # Preserve input
+    original_paths = paths[:]
     buckets = defaultdict(list)
     # Divvy up paths into per-segment buckets
     for path in paths:
@@ -82,7 +84,14 @@ def combine(paths, expansions=[], include_raw=False):
                     path.append(part)
             key_parts.append(part)
         # New final key/value pair
-        mapping[".".join(key_parts)] = map(lambda x: ".".join(x), paths)
+        # (Strip out any incorrectly expanded paths not present in the input.)
+        # (TODO: figure out how not to expand combinatorically when that's not
+        # correct. sigh)
+        raw_paths = filter(
+            lambda x: x in original_paths,
+            map(lambda x: ".".join(x), paths)
+        )
+        mapping[".".join(key_parts)] = raw_paths
     return mapping if include_raw else mapping.keys()
 
 

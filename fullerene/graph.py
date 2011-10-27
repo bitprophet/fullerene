@@ -10,7 +10,6 @@ class Graph(object):
         # Basic init
         children = children or []
         self.path = path
-        self._stats = {}
         self.hostname = hostname
 
         # Children are (potential) graphs of their own, for now just used for
