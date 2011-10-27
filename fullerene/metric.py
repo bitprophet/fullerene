@@ -91,7 +91,16 @@ def combine(paths, expansions=[], include_raw=False):
             lambda x: x in original_paths,
             map(lambda x: ".".join(x), paths)
         )
-        mapping[".".join(key_parts)] = raw_paths
+        # Do the same for keys, when expanding; have to search substrings.
+        merged_path = ".".join(key_parts)
+        merged_path_good = False
+        lcd, _, rest = merged_path.partition('{')
+        for original in original_paths:
+            if original.startswith(lcd):
+                merged_path_good = True
+                break
+        if merged_path_good:
+            mapping[merged_path] = raw_paths
     return mapping if include_raw else mapping.keys()
 
 
