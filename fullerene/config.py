@@ -42,7 +42,13 @@ class Config(object):
                 else:
                     new_metric = Metric(path=item, config=self)
                 self.groups[name][item] = new_metric
+        # 'collections'
+        self.collections = config.get('collections', {})
         # Default graph args
         self.defaults = config.get('defaults', {})
         # Timeperiod aliases
         self.periods = config.get('periods', {})
+
+    @property
+    def metric_groups(self):
+        return sorted(self.groups)

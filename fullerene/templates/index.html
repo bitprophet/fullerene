@@ -1,21 +1,17 @@
 {% extends "base.html" %}
 {% block body %}
-<ul>
-    {% for domain, hosts in domains %}
-    <li>
-        <strong>{{ domain|dots }}</strong>
+<div class="row">
+    <div class="span16">
+        <h1>Collections</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="span16">
         <ul>
-            {% for host in hosts %}
-            <li>
-                <strong>{{ host }}:</strong>
-                {% for group in groupings %}
-                <a href="{{ url_for('grouping', hostname=host + '_' + domain, group=group, period='recent') }}">{{ group }}</a>
-                {% if not loop.last %}|{% endif %}
-                {% endfor %}
-            </li>
-            {% endfor %}
+        {% for name, uri in collections %}
+            <li><a href="{{ uri }}">{{ name }}</a></li>
+        {% endfor %}
         </ul>
-    </li>
-    {% endfor %}
-</ul>
+    </div>
+</div>
 {% endblock %}

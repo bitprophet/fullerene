@@ -2,15 +2,15 @@
 {% block body %}
 <div class="row">
     <div class="span16">
-        <h1 style="margin-bottom: 0">{{ hostname|dots }}</h1>
+        <h1 style="margin-bottom: 0">{{ host|dots }}</h1>
         <p>
-            <strong><a href="{{ url_for('index') }}">&laquo; all hosts</a></strong>
+            <strong><a href="{{ url_for('collection', collection=collection) }}">&laquo; {{ collection }}</a></strong>
             |
-            {% for group in groupings %}
-                {% if group == current_group %}
-                    <strong>{{ group }}</strong>
+            {% for mgroup in metric_groups %}
+                {% if mgroup == current_group %}
+                    <strong>{{ mgroup }}</strong>
                 {% else %}
-                    <a href="{{ url_for('grouping', group=group, hostname=hostname, period=current_period) }}">{{ group }}</a>
+                    <a href="{{ url_for('host_metrics', collection=collection, group=group, metric_group=mgroup, host=host, period=current_period) }}">{{ mgroup }}</a>
                 {% endif %}
                 {% if not loop.last %}|{% endif %}
             {% endfor %}
@@ -21,7 +21,7 @@
             {% if period == current_period %}
                 <strong>{{ period }}</strong>
             {% else %}
-                <a href="{{ url_for('grouping', group=current_group, period=period, hostname=hostname) }}">{{ period }}</a>
+                <a href="{{ url_for('host_metrics', collection=collection, group=group, metric_group=mgroup, host=host, period=period) }}">{{ period }}</a>
             {% endif %}
             {% if not loop.last %}|{% endif %}
         {% endfor %}

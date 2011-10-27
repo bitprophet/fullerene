@@ -15,19 +15,12 @@ from config import Config
 # Set up globals
 #
 
-CONFIG = os.path.join(os.path.dirname(__file__), "..", "config.yml")
+ROOT = os.path.join(os.path.dirname(__file__), "..")
+CONFIG = os.path.join(ROOT, "config.yml")
 with open(CONFIG) as fd:
     config = Config(fd.read())
 
 app = flask.Flask(__name__)
-
-
-#
-# Helpers/utils
-#
-
-def groupings():
-    return sorted(config.groups.keys())
 
 
 #
@@ -56,35 +49,66 @@ def composer(graph):
 
 @app.route('/')
 def index():
+    collections = [(
+        'All hosts, by domain name',
+        flask.url_for('collection', collection='by_domain')
+    )]
+    for slug, data in config.collections.items():
+        collections.append((
+            data['title'],
+            flask.url_for('collection', collection=slug)
+        ))
+    return flask.render_template(
+        'index.html',
+        collections=collections
+    )
+
+@app.route('/<collection>/')
+def collection(collection):
+    # Built-in introspection-driven by-domain collection
     hosts = config.graphite.query("*")
     domains = defaultdict(list)
     for host in hosts:
         name, _, domain = host.partition('_')
-        domains[domain].append(name)
-    domains = sorted(domains.iteritems())
-    return flask.render_template(
-        'index.html',
-        domains=domains,
-        groupings=groupings()
-    )
+        domains[domain].append(host.replace('_', '.'))
+    by_domain = {
+        'title': "By domain",
+        'groups': domains
+    }
+    # Pull in configured (static) collections
+    collections = dict(config.collections, by_domain=by_domain)
+    try:
+        return flask.render_template(
+            'hostlist.html',
+            name=collection,
+            collection=collections[collection],
+            metric_groups=config.metric_groups,
+        )
+    except KeyError:
+        flask.abort(404)
 
-@app.route('/hosts/<hostname>/<group>/<period>/')
-def grouping(hostname, group, period):
+@app.route('/<collection>/<group>/<host>/<metric_group>/<period>/')
+def host_metrics(collection, group, host, metric_group, period):
     # Get metric objects for this group
-    raw_metrics = config.groups[group].values()
+    raw_metrics = config.groups[metric_group].values()
     # Filter period value through defined aliases
     kwargs = {'from': config.periods.get(period, period)}
+    # Switch to underscores if needed
+    if '.' in host:
+        host = host.replace('.', '_')
     # Generate graph objects from each metric, based on hostname context
-    graphs = map(lambda m: m.graphs(hostname, **kwargs), raw_metrics)
+    graphs = map(lambda m: m.graphs(host, **kwargs), raw_metrics)
     merged = reduce(operator.add, graphs, [])
     return flask.render_template(
         'host.html',
-        hostname=hostname,
+        host=host,
         metrics=merged,
-        groupings=groupings(),
+        metric_groups=config.metric_groups,
         periods=config.periods.keys(),
-        current_group=group,
-        current_period=period
+        current_group=metric_group,
+        current_period=period,
+        collection=collection,
+        group=group
     )
 
 @app.route('/render/')

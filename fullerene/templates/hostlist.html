@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row">
+    <div class="span16">
+        <h1>{{ collection['title'] }}</h1>
+        <p><a href="{{ url_for('index') }}">&laquo; Index</a></p>
+    </div>
+</div>
+<div class="row">
+    <div class="span16">
+        <ul>
+            {% for group in collection['groups']|sort %}
+            <li>
+                <strong>{{ group|dots }}</strong>
+                <ul>
+                    {% for host in collection['groups'][group]|sort %}
+                    <li>
+                        <strong>{{ host }}:</strong>
+                        {% for mgroup in metric_groups %}
+                        <a href="{{ url_for('host_metrics', host=host, metric_group=mgroup, period='recent', collection=name, group=group) }}">{{ mgroup }}</a>
+                        {% if not loop.last %}|{% endif %}
+                        {% endfor %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
