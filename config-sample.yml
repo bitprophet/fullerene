@@ -1,0 +1,74 @@
+graphite_uri: http://localhost
+hosts:
+  exclude:
+    - carbon
+defaults:
+  height: 250
+  width: 400
+  from: -4hours
+periods:
+  recent: -4hours
+  day: -24hours
+  week: -7days
+metrics:
+  free_disk_space:
+    path: df.*.df_complex.free.value
+    exclude: [dev, dev-shm, var-lock, var-run]
+    expand: all
+groups:
+  baseline:
+    - free_disk_space
+    - disk.xvda1.disk_octets.{read,write}
+    - disk.xvdb.disk_octets.{read,write}
+    - interface.if_octets.eth0.{rx,tx}
+    - load.load.*
+    - memory.memory.free.value
+  disk:
+    - free_disk_space
+    - disk.{xvda1,xvdb,xvdf}.disk_octets.{read,write}
+  cpu:
+    - load.load.*
+  network:
+    - interface.if_octets.eth0.{rx,tx}
+collections:
+  by_project:
+    title: "By project"
+    groups:
+      project1:
+        - cache10.shared.com
+        - cache11.shared.com
+        - chat1.shared.com
+        - chat2.shared.com
+        - chat3.shared.com
+        - db.project1.com
+        - haproxy1.shared.com
+        - haproxy2.shared.com
+        - lb2.shared.com
+        - lb3.shared.com
+        - redis10.shared.com
+        - redis11.shared.com
+        - search1.shared.com
+        - search2.shared.com
+        - web5.shared.com
+        - web6.shared.com
+        - web7.shared.com
+        - web8.shared.com
+      project2:
+        - celery2.project2.com
+        - chat1.shared.com
+        - chat2.shared.com
+        - chat3.shared.com
+        - db.project2.com
+        - lb2.shared.com
+        - lb3.shared.com
+        - redis10.shared.com
+        - redis11.shared.com
+        - search1.shared.com
+        - search2.shared.com
+        - web1.project2.com
+        - web10.project2.com
+        - web2.project2.com
+        - web3.project2.com
+        - web4.project2.com
+        - web8.project2.com
+        - web9.project2.com
