@@ -40,7 +40,8 @@ def _render(graph, **overrides):
 
 @app.template_filter('composer')
 def composer(graph):
-    return config.graphite.uri + "/composer/" + graph.querystring
+    if config.external_graphite:
+        return config.external_graphite + "/composer/" + graph.querystring
 
 
 #

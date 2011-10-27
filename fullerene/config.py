@@ -15,11 +15,13 @@ class Config(object):
             except KeyError:
                 exclude_hosts = []
             self.graphite = Graphite(
-                uri=config['graphite_uri'],
+                uri=config['graphite_uris']['internal'],
                 exclude_hosts=exclude_hosts
             )
         except KeyError:
-            raise ValueError, "Configuration must specify graphite_uri"
+            raise ValueError, "Configuration must specify graphite_uris: internal"
+        # Optional external URL (for links)
+        self.external_graphite = config['graphite_uris'].get('external', None)
         # 'metrics' section
         self.metrics = {}
         for name, options in config.get('metrics', {}).iteritems():

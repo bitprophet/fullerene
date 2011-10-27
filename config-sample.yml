@@ -1,4 +1,6 @@
-graphite_uri: http://localhost
+graphite_uris:
+  internal: http://localhost
+  # external: https://externally.accessible.url.here/
 hosts:
   exclude:
     - carbon
