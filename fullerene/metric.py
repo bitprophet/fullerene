@@ -108,7 +108,17 @@ class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
     """
-    def __init__(self, path, config, excludes=(), expansions=()):
+    def __init__(
+            self,
+            path,
+            config,
+            excludes=(),
+            expansions=(),
+            title=None,
+            title_param=None
+        ):
+        self.title = title or path
+        self.title_param = title_param
         self.path = path
         self.config = config
         # Generate split version of our path, and note any wildcards
@@ -214,6 +224,6 @@ class Metric(object):
         tuples = result.iteritems()
         merged_kwargs = dict(self.config.defaults, **kwargs)
         return [
-            Graph(hostname, path, subpaths, self.config, **merged_kwargs)
+            Graph(hostname, path, subpaths, self.config, self.title, self.title_param, **merged_kwargs)
             for path, subpaths in tuples
         ]

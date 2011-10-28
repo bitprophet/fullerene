@@ -26,14 +26,16 @@ class Config(object):
         self.metrics = {}
         for name, options in config.get('metrics', {}).iteritems():
             self.metrics[name] = Metric(
+                title=options.get('title', None),
+                title_param=options.get('title_param', None),
                 path=options['path'],
                 config=self,
                 excludes=options.get('exclude', ()),
                 expansions=options.get('expand', ())
             )
-        # 'groups' section
+        # Metric groups
         self.groups = {}
-        for name, metrics in config.get('groups', {}).iteritems():
+        for name, metrics in config.get('metric_groups', {}).iteritems():
             if name not in self.groups:
                 self.groups[name] = {}
             for item in metrics:

@@ -14,6 +14,7 @@ periods:
   week: -7days
 metrics:
   free_disk_space:
+    title: Free Disk Space
     path: df.*.df_complex.free.value
     exclude: [dev, dev-shm, var-lock, var-run]
     expand: all

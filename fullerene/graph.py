@@ -1,5 +1,14 @@
 class Graph(object):
-    def __init__(self, hostname, path, children=(), config=None, **kwargs):
+    def __init__(
+            self,
+            hostname,
+            path,
+            children=(),
+            config=None,
+            title=None,
+            title_param=None,
+            **kwargs
+        ):
         """
         hostname: hostname part of metric path
         path: rest of metric path to query Graphite for when rendering
@@ -11,6 +20,8 @@ class Graph(object):
         children = children or []
         self.path = path
         self.hostname = hostname
+        self.title = title
+        self.title_param = title_param
 
         # Children are (potential) graphs of their own, for now just used for
         # stats info.
@@ -22,7 +33,10 @@ class Graph(object):
         # Add default title
         if 'title' not in kwargs:
             period = " (%s)" % kwargs['from'] if 'from' in kwargs else ""
-            kwargs['title'] = str(self) + period
+            param = ""
+            if self.title_param:
+                param = " (%s)" % self.path.split('.')[self.title_param]
+            kwargs['title'] = (self.title + param) if self.title else self.path
         kwargs['target'] = "%s.%s" % (self.hostname, self.path)
         self.kwargs = kwargs
 

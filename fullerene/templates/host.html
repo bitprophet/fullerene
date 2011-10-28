@@ -21,7 +21,7 @@
             {% if period == current_period %}
                 <strong>{{ period }}</strong>
             {% else %}
-                <a href="{{ url_for('host_metrics', collection=collection, group=group, metric_group=mgroup, host=host, period=period) }}">{{ period }}</a>
+                <a href="{{ url_for('host_metrics', collection=collection, group=group, metric_group=current_group, host=host, period=period) }}">{{ period }}</a>
             {% endif %}
             {% if not loop.last %}|{% endif %}
         {% endfor %}
