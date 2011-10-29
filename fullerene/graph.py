@@ -3,7 +3,6 @@ class Graph(object):
             self,
             hostname,
             path,
-            children=(),
             config=None,
             title=None,
             title_param=None,
@@ -12,23 +11,14 @@ class Graph(object):
         """
         hostname: hostname part of metric path
         path: rest of metric path to query Graphite for when rendering
-        children: list of constituent non-globbed paths
         config: config object for querying
         kwargs: graph drawing options such as 'from'
         """
         # Basic init
-        children = children or []
         self.path = path
         self.hostname = hostname
         self.title = title
         self.title_param = title_param
-
-        # Children are (potential) graphs of their own, for now just used for
-        # stats info.
-        self.children = map(
-            lambda x: Graph(hostname, x, (), config, **kwargs),
-            children
-        )
 
         # Add default title
         if 'title' not in kwargs:
@@ -41,10 +31,8 @@ class Graph(object):
         self.kwargs = kwargs
 
         # Store data about what our graph shows (e.g. min/max)
-        # (but only if we're a single real metric path, i.e. no children)
-        if config and not children:
-            for name, value in config.graphite.stats(kwargs).items():
-                setattr(self, name, value)
+        if config:
+            self.stats = config.graphite.stats(kwargs)
 
     def __str__(self):
         return self.path

@@ -220,10 +220,9 @@ class Metric(object):
             if good:
                 matches.append(item)
         # Perform any necessary combining into brace-expressions & return
-        result = combine(matches, self.to_expand, include_raw=True)
-        tuples = result.iteritems()
+        result = combine(matches, self.to_expand)
         merged_kwargs = dict(self.config.defaults, **kwargs)
         return [
-            Graph(hostname, path, subpaths, self.config, self.title, self.title_param, **merged_kwargs)
-            for path, subpaths in tuples
+            Graph(hostname, path, self.config, self.title, self.title_param, **merged_kwargs)
+            for path in result
         ]

@@ -33,6 +33,7 @@ class Graphite(object):
         return filtered
 
     def stats(self, kwargs):
+        kwargs = dict(kwargs) # lest we screw it up for rendering later
         kwargs['format'] = 'json'
         uri = "%s/render/" % self.uri
         result = json.loads(requests.get(uri, params=kwargs).content)
@@ -46,15 +47,17 @@ class Graphite(object):
         #   },
         #   ...,
         # ]
-        points = [x[0] for x in result[0]['datapoints']]
-        # Filter nulls
-        points = filter(lambda x: x is not None, points)
-        values = map(lambda x: float(x), points)
-        return {
-            'min': min(values),
-            'max': max(values),
-            'mean': sum(values) / len(values)
-        }
+        for metric in result:
+            points = [x[0] for x in metric['datapoints']]
+            # Filter nulls
+            points = filter(lambda x: x is not None, points)
+            values = map(lambda x: float(x), points)
+            metric.update({
+                'min': min(values),
+                'max': max(values),
+                'mean': sum(values) / len(values)
+            })
+        return result
 
     def query_all(base, max_depth=7):
         """

@@ -43,8 +43,8 @@
     </div>
     <div class="span7">
         <ul>
-    {% for stat in graph.children %}
-    <li>{{ stat }} &raquo; min: {{ stat.min }} | mean: {{ stat.mean }} | max: {{ stat.max }}</li>
+    {% for metric in graph.stats %}
+    <li>{{ metric.target }} &raquo; min: {{ metric.min }} | mean: {{ metric.mean }} | max: {{ metric.max }}</li>
     {% endfor %}
 </ul>
     </div>
