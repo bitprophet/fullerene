@@ -33,13 +33,23 @@ class Graphite(object):
         return filtered
 
     def stats(self, kwargs):
-        kwargs['rawData'] = 'true'
+        kwargs['format'] = 'json'
         uri = "%s/render/" % self.uri
-        result = requests.get(uri, params=kwargs).content.strip().split('|')[1]
-        values = map(
-            lambda x: float(x),
-            filter(lambda x: x != 'None', result.split(','))
-        )
+        result = json.loads(requests.get(uri, params=kwargs).content)
+        # JSON: [
+        #   {
+        #       target: "lol.cats",
+        #       datapoints: [
+        #           [<data>, <timestamp>],
+        #           ...
+        #       ]
+        #   },
+        #   ...,
+        # ]
+        points = [x[0] for x in result[0]['datapoints']]
+        # Filter nulls
+        points = filter(lambda x: x is not None, points)
+        values = map(lambda x: float(x), points)
         return {
             'min': min(values),
             'max': max(values),
