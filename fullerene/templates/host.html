@@ -28,8 +28,9 @@
         </p>
     </div>
 </div>
-{% for graph in metrics %}
+{% for tuple in metrics|batch(2) %}
 <div class="row">
+    {% for graph in tuple %}
     <div class="span7">
         <p>
         {% if graph|composer %}
@@ -56,6 +57,7 @@
         </tbody>
     </table>
     </div>
+    {% endfor %}
 </div>
 {% endfor %}
 {% endblock %}
