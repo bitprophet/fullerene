@@ -32,7 +32,6 @@
 <div class="row">
     {% for graph in tuple %}
     <div class="span7">
-        <p>
         {% if graph|composer %}
         <a href="{{ graph|composer }}" title="Click for Graphite composer">
             <img src="{{ graph|render }}" />
@@ -40,7 +39,6 @@
         {% else %}
             <img src="{{ graph|render }}" />
         {% endif %}
-        </p>
         <table>
             <thead>
                 <tr><th>Metric</th><th>Min</th><th>Mean</th><th>Max</th></tr>
