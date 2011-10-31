@@ -44,7 +44,8 @@
     <div class="span7">
         <ul>
     {% for metric in graph.stats %}
-    <li>{{ metric.target }} &raquo; min: {{ metric.min }} | mean: {{ metric.mean }} | max: {{ metric.max }}</li>
+    <li>{{ metric.target }} &raquo; min: {{ metric.stats.formatted.min }} |
+    mean: {{ metric.stats.formatted.mean }} | max: {{ metric.stats.formatted.max }}</li>
     {% endfor %}
 </ul>
     </div>

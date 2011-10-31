@@ -36,28 +36,7 @@ class Graphite(object):
         kwargs = dict(kwargs) # lest we screw it up for rendering later
         kwargs['format'] = 'json'
         uri = "%s/render/" % self.uri
-        result = json.loads(requests.get(uri, params=kwargs).content)
-        # JSON: [
-        #   {
-        #       target: "lol.cats",
-        #       datapoints: [
-        #           [<data>, <timestamp>],
-        #           ...
-        #       ]
-        #   },
-        #   ...,
-        # ]
-        for metric in result:
-            points = [x[0] for x in metric['datapoints']]
-            # Filter nulls
-            points = filter(lambda x: x is not None, points)
-            values = map(lambda x: float(x), points)
-            metric.update({
-                'min': min(values),
-                'max': max(values),
-                'mean': sum(values) / len(values)
-            })
-        return result
+        return json.loads(requests.get(uri, params=kwargs).content)
 
     def query_all(base, max_depth=7):
         """
