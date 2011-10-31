@@ -40,14 +40,21 @@
             <img src="{{ graph|render }}" />
         {% endif %}
         </p>
-    </div>
-    <div class="span7">
-        <ul>
-    {% for metric in graph.stats %}
-    <li>{{ metric.target }} &raquo; min: {{ metric.stats.formatted.min }} |
-    mean: {{ metric.stats.formatted.mean }} | max: {{ metric.stats.formatted.max }}</li>
-    {% endfor %}
-</ul>
+        <table>
+            <thead>
+                <tr><th>Metric</th><th>Min</th><th>Mean</th><th>Max</th></tr>
+            </thead>
+            <tbody>
+            {% for metric in graph.stats %}
+            <tr>
+                <td>{{ metric.target.split('.')[1:]|join('.') }}</td>
+                <td>{{ metric.stats.formatted.min }}</td>
+                <td>{{ metric.stats.formatted.mean }}</td>
+                <td>{{ metric.stats.formatted.max }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     </div>
 </div>
 {% endfor %}
