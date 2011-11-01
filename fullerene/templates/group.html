@@ -17,7 +17,7 @@
         <h3 style="display: inline;">{{ metric.title }}</h3> <span>({{ metric.path }})</span>
     </div>
 </div>
-    {% for hosts in group.hosts|batch(per_row) %}
+    {% for hosts in group.hosts|sort|batch(per_row) %}
 <div class="row">
     {% for host in hosts %}
     <div class="span{{ col_size }}">
