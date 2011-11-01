@@ -19,7 +19,7 @@
 </div>
     {% for hosts in group.hosts|batch(per_row) %}
 <div class="row">
-    {% for host in hosts[1:2] %}
+    {% for host in hosts %}
     <div class="span{{ col_size }}">
         {% for graph in metric.graphs(host) %}
             <p>
