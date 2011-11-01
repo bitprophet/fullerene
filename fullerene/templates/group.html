@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row">
+    <div class="span16">
+        <h1>{{ group.title }}</h1>
+    </div>
+</div>
+{% for metric in group.metrics %}
+<div class="row">
+    <div class="span16">
+        <h3>{{ metric.title }}</h3>
+    </div>
+</div>
+    {% for hosts in group.hosts|batch(per_row) %}
+<div class="row">
+    {% for host in hosts %}
+    <div class="span{{ col_size }}">
+        {# <span>{{ host }}</span> #}
+        {% for graph in metric.graphs(host) %}
+        <p><img src="{{ graph|render(height=100, width=200, hideLegend=true, title=host, hideAxes=true) }}" /></p>
+            {% if not loop.last %}<br />{% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+    {% endfor %}
+{% endfor %}
+{% endblock %}

@@ -41,7 +41,8 @@ def _render(graph, **overrides):
     """
     Takes a Graph as input, prints out full render URL.
     """
-    return flask.url_for("render", **graph.kwargs)
+    params = dict(graph.kwargs, **overrides)
+    return flask.url_for("render", **params)
 
 @app.template_filter('composer')
 def composer(graph):
@@ -69,7 +70,6 @@ def index():
 
 @app.route('/by_domain/<domain>/')
 def domain(domain):
-    # Built-in introspection-driven by-domain collection
     return flask.render_template(
         'domain.html',
         domain=domain,
@@ -79,7 +79,16 @@ def domain(domain):
 
 @app.route('/<collection>/<group>/')
 def group(collection, group):
-    pass
+    collection = config.collections[collection]
+    per_row = 4
+    col_size = (16 / per_row)
+    return flask.render_template(
+        'group.html',
+        collection=collection,
+        group=collection['groups'][group],
+        per_row=per_row,
+        col_size=col_size
+    )
 
 @app.route('/by_domain/<domain>/<host>/<metric_group>/<period>/')
 def host(domain, host, metric_group, period):

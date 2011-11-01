@@ -202,6 +202,7 @@ class Metric(object):
         The kwargs will be used to override any defaults from the config
         object.
         """
+        hostname = hostname.replace('.', '_')
         # Expand out to full potential list of paths, apply filters
         matches = []
         for item in self.expand(hostname):
