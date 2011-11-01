@@ -82,12 +82,21 @@ def group(collection, group):
     collection = config.collections[collection]
     per_row = 4
     col_size = (16 / per_row)
+    thumbnail_opts = {
+        'height': 100,
+        'width': 200,
+        'hideLegend': True,
+        'hideGrid': True,
+        'yBoundsOnly': True,
+        'hideXAxis': True
+    }
     return flask.render_template(
         'group.html',
         collection=collection,
         group=collection['groups'][group],
         per_row=per_row,
-        col_size=col_size
+        col_size=col_size,
+        thumbnail_opts=thumbnail_opts
     )
 
 @app.route('/by_domain/<domain>/<host>/<metric_group>/<period>/')

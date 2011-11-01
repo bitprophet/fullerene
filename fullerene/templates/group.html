@@ -17,7 +17,7 @@
     <div class="span{{ col_size }}">
         {# <span>{{ host }}</span> #}
         {% for graph in metric.graphs(host) %}
-        <p><img src="{{ graph|render(height=100, width=200, hideLegend=true, title=host, hideAxes=true) }}" /></p>
+        <p><img src="{{ graph|render(title=host, **thumbnail_opts) }}" /></p>
             {% if not loop.last %}<br />{% endif %}
         {% endfor %}
     </div>
