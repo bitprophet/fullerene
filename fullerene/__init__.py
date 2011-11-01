@@ -52,7 +52,7 @@ def composer(graph):
 def index():
     collections = [(
         'All hosts, by domain name',
-        flask.url_for('collection', collection='by_domain')
+        flask.url_for('by_domain')
     )]
     for slug, data in config.collections.items():
         collections.append((
@@ -64,32 +64,26 @@ def index():
         collections=collections
     )
 
-@app.route('/<collection>/')
-def collection(collection):
+@app.route('/by_domain/')
+def by_domain():
     # Built-in introspection-driven by-domain collection
     hosts = config.graphite.query("*")
     domains = defaultdict(list)
     for host in hosts:
         name, _, domain = host.partition('_')
         domains[domain].append(host.replace('_', '.'))
-    by_domain = {
-        'title': "By domain",
-        'groups': domains
-    }
-    # Pull in configured (static) collections
-    collections = dict(config.collections, by_domain=by_domain)
-    try:
-        return flask.render_template(
-            'collection.html',
-            name=collection,
-            collection=collections[collection],
-            metric_groups=config.metric_groups,
-        )
-    except KeyError:
-        flask.abort(404)
+    return flask.render_template(
+        'by_domain.html',
+        domains=domains,
+        metric_groups=config.metric_groups,
+    )
 
-@app.route('/<collection>/<group>/<host>/<metric_group>/<period>/')
-def host_metrics(collection, group, host, metric_group, period):
+@app.route('/<collection>/')
+def collection(collection):
+    pass
+
+@app.route('/<host>/<metric_group>/<period>/')
+def host_metrics(host, metric_group, period):
     # Get metric objects for this group
     raw_metrics = config.groups[metric_group].values()
     # Filter period value through defined aliases
@@ -108,8 +102,6 @@ def host_metrics(collection, group, host, metric_group, period):
         periods=config.periods.keys(),
         current_group=metric_group,
         current_period=period,
-        collection=collection,
-        group=group
     )
 
 @app.route('/render/')

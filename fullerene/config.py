@@ -4,6 +4,9 @@ from graphite import Graphite
 from metric import Metric
 
 
+
+
+
 class Config(object):
     def __init__(self, text):
         # Load up
@@ -39,19 +42,25 @@ class Config(object):
             if name not in self.groups:
                 self.groups[name] = {}
             for item in metrics:
-                # First check for any named metrics
-                if item in self.metrics:
-                    new_metric = self.metrics[item]
-                # Then create one on the fly
-                else:
-                    new_metric = Metric(path=item, config=self)
-                self.groups[name][item] = new_metric
+                self.groups[name][item] = self.parse_metric(item)
         # 'collections'
         self.collections = config.get('collections', {})
+        for collection in self.collections.values():
+            for group in collection['groups'].values():
+                group['metrics'] = map(self.parse_metric, group['metrics'])
         # Default graph args
         self.defaults = config.get('defaults', {})
         # Timeperiod aliases
         self.periods = config.get('periods', {})
+
+    def parse_metric(self, item):
+        # First check for any named metrics
+        if item in self.metrics:
+            metric = self.metrics[item]
+        # Then create one on the fly
+        else:
+            metric = Metric(path=item, config=self)
+        return metric
 
     @property
     def metric_groups(self):
