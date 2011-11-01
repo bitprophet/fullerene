@@ -46,6 +46,12 @@ def _render(graph, **overrides):
 
 @app.template_filter('composer')
 def composer(graph):
+    """
+    We don't typically want this to accept overrides -- if somebody wants to go
+    to the composer view, many e.g. thumbnail/presentational options should
+    probably get turned off so they get a more normal view. Useful things like
+    timeperiod/from will typically be preserved.
+    """
     if config.external_graphite:
         return config.external_graphite + "/composer/" + graph.querystring
 
@@ -82,13 +88,15 @@ def group(collection, group):
     collection = config.collections[collection]
     per_row = 4
     col_size = (16 / per_row)
+    period = '-4hours'
     thumbnail_opts = {
         'height': 100,
         'width': 200,
         'hideLegend': True,
         'hideGrid': True,
         'yBoundsOnly': True,
-        'hideXAxis': True
+        'hideXAxis': True,
+        'from': period,
     }
     return flask.render_template(
         'group.html',
@@ -96,7 +104,8 @@ def group(collection, group):
         group=collection['groups'][group],
         per_row=per_row,
         col_size=col_size,
-        thumbnail_opts=thumbnail_opts
+        thumbnail_opts=thumbnail_opts,
+        period=period
     )
 
 @app.route('/by_domain/<domain>/<host>/<metric_group>/<period>/')
