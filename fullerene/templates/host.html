@@ -2,15 +2,13 @@
 {% block body %}
 <div class="row">
     <div class="span16">
-        <h1 style="margin-bottom: 0">{{ host|dots }}</h1>
+        <h1 style="margin-bottom: 0">{{ host }}.<a href="{{ url_for('domain', domain=domain) }}">{{ domain }}</a></h1>
         <p>
-            <strong><a href="{{ url_for('by_domain') }}">&laquo; Back to domain list</a></strong>
-            |
             {% for mgroup in metric_groups %}
                 {% if mgroup == current_group %}
                     <strong>{{ mgroup }}</strong>
                 {% else %}
-                    <a href="{{ url_for('host_metrics', metric_group=mgroup, host=host, period=current_period) }}">{{ mgroup }}</a>
+                    <a href="{{ url_for('host', domain=domain, metric_group=mgroup, host=host, period=current_period) }}">{{ mgroup }}</a>
                 {% endif %}
                 {% if not loop.last %}|{% endif %}
             {% endfor %}
@@ -21,7 +19,7 @@
             {% if period == current_period %}
                 <strong>{{ period }}</strong>
             {% else %}
-                <a href="{{ url_for('host_metrics', metric_group=current_group, host=host, period=period) }}">{{ period }}</a>
+                <a href="{{ url_for('host', domain=domain, metric_group=current_group, host=host, period=period) }}">{{ period }}</a>
             {% endif %}
             {% if not loop.last %}|{% endif %}
         {% endfor %}
@@ -46,7 +44,7 @@
             <tbody>
             {% for metric in graph.stats %}
             <tr>
-                <td>{{ metric.target.split('.')[1:]|join('.') }}</td>
+                <td>{{ metric.target|dot(1, -1) }}</td>
                 <td>{{ metric.stats.formatted.min }}</td>
                 <td>{{ metric.stats.formatted.mean }}</td>
                 <td>{{ metric.stats.formatted.max }}</td>

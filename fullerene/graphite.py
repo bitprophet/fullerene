@@ -1,5 +1,8 @@
+from collections import defaultdict
 import json
 import requests
+
+from utils import dots, sliced
 
 
 class Graphite(object):
@@ -53,3 +56,17 @@ class Graphite(object):
             query = "%s.%s" % (base, ".".join(['*'] * num))
             queries.append(query)
         return self.query(queries, leaves_only=True)
+
+    def hosts_by_domain(self):
+        hosts = self.query("*")
+        domains = defaultdict(list)
+        for host in hosts:
+            name, _, domain = host.partition('_')
+            domains[dots(domain)].append(dots(host))
+        return domains
+
+    def hosts_for_domain(self, domain):
+        return map(
+            lambda x: sliced(x, 1),
+            self.hosts_by_domain()[dots(domain)]
+        )

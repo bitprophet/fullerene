@@ -8,8 +8,15 @@
 <div class="row">
     <div class="span16">
         <ul>
-        {% for name, uri in collections %}
-            <li><a href="{{ uri }}">{{ name }}</a></li>
+        {% for slug, collection in collections %}
+            <li>
+                <strong>{{ collection.title }}</strong>
+                <ul>
+                {% for group in collection.groups|sort %}
+                <li><a href="{{ url_for('group', collection=slug, group=group) }}">{{ group }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>
         {% endfor %}
         </ul>
     </div>

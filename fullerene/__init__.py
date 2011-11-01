@@ -9,6 +9,7 @@ import yaml
 from metric import Metric
 from graphite import Graphite
 from config import Config
+from utils import dots, sliced
 
 
 #
@@ -28,8 +29,12 @@ app = flask.Flask(__name__)
 #
 
 @app.template_filter('dots')
-def dots(s):
-    return s.replace('_', '.')
+def dots_(string):
+    return dots(string)
+
+@app.template_filter('dot')
+def dot_(string, *args):
+    return sliced(string, *args)
 
 @app.template_filter('render')
 def _render(graph, **overrides):
@@ -50,52 +55,45 @@ def composer(graph):
 
 @app.route('/')
 def index():
-    collections = [(
-        'All hosts, by domain name',
-        flask.url_for('by_domain')
-    )]
-    for slug, data in config.collections.items():
-        collections.append((
-            data['title'],
-            flask.url_for('collection', collection=slug)
-        ))
+    collections = [
+        ('by_domain', {
+            'title': 'All hosts, by domain name',
+            'groups': config.graphite.hosts_by_domain(),
+        })
+    ]
+    collections.extend(config.collections.items())
     return flask.render_template(
         'index.html',
         collections=collections
     )
 
-@app.route('/by_domain/')
-def by_domain():
+@app.route('/by_domain/<domain>/')
+def domain(domain):
     # Built-in introspection-driven by-domain collection
-    hosts = config.graphite.query("*")
-    domains = defaultdict(list)
-    for host in hosts:
-        name, _, domain = host.partition('_')
-        domains[domain].append(host.replace('_', '.'))
     return flask.render_template(
-        'by_domain.html',
-        domains=domains,
+        'domain.html',
+        domain=domain,
+        hosts=config.graphite.hosts_for_domain(domain),
         metric_groups=config.metric_groups,
     )
 
-@app.route('/<collection>/')
-def collection(collection):
+@app.route('/<collection>/<group>/')
+def group(collection, group):
     pass
 
-@app.route('/<host>/<metric_group>/<period>/')
-def host_metrics(host, metric_group, period):
+@app.route('/by_domain/<domain>/<host>/<metric_group>/<period>/')
+def host(domain, host, metric_group, period):
     # Get metric objects for this group
     raw_metrics = config.groups[metric_group].values()
     # Filter period value through defined aliases
     kwargs = {'from': config.periods.get(period, period)}
-    # Switch to underscores if needed
-    if '.' in host:
-        host = host.replace('.', '_')
     # Generate graph objects from each metric, based on hostname context
-    graphs = map(lambda m: m.graphs(host, **kwargs), raw_metrics)
+    graphite_host = host + '_' + domain.replace('.', '_')
+    graphs = map(lambda m: m.graphs(graphite_host, **kwargs), raw_metrics)
     merged = reduce(operator.add, graphs, [])
     return flask.render_template(
         'host.html',
+        domain=domain,
         host=host,
         metrics=merged,
         metric_groups=config.metric_groups,
