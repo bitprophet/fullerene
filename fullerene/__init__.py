@@ -68,7 +68,12 @@ def index():
             'groups': config.graphite.hosts_by_domain(),
         })
     ]
-    collections.extend(config.collections.items())
+    collections.extend(
+        sorted(
+            config.collections.items(),
+            key=lambda x: x[0]
+        )
+    )
     return flask.render_template(
         'index.html',
         collections=collections
