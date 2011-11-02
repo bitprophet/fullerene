@@ -86,7 +86,7 @@ def domain(domain):
 @app.route('/<collection>/<group>/')
 def group(collection, group):
     collection = config.collections[collection]
-    per_row = 4
+    per_row = 5
     col_size = (16 / per_row)
     period = '-4hours'
     thumbnail_opts = {
