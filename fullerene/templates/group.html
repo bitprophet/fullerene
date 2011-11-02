@@ -19,18 +19,16 @@
 </div>
     {% for hosts in group.hosts|sort|batch(per_row) %}
 <div class="row">
+    <div class="span16">
     {% for host in hosts %}
-    <div class="span{{ col_size }}">
         {% for graph in metric.graphs(host) %}
-            <p>
                 {% if graph|composer %}<a href="{{ graph|composer }}">{% endif %}
                 <img src="{{ graph|render(title=host, **thumbnail_opts) }}" />
                 {% if graph|composer %}</a>{% endif %}
-            </p>
             {% if not loop.last %}<br />{% endif %}
         {% endfor %}
-    </div>
     {% endfor %}
+    </div>
 </div>
     {% endfor %}
 {% endfor %}
