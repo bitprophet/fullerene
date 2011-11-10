@@ -4,9 +4,6 @@ from graphite import Graphite
 from metric import Metric
 
 
-
-
-
 class Config(object):
     def __init__(self, text):
         # Load up
