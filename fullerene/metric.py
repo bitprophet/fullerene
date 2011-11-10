@@ -227,6 +227,6 @@ class Metric(object):
         first_merge = dict(self.extra_options, **kwargs)
         merged_kwargs = dict(self.config.defaults, **first_merge)
         return [
-            Graph(hostname, path, self.config, self.title, self.title_param, **merged_kwargs)
+            Graph("%s.%s" % (hostname, path), self.config, self.title, self.title_param, **merged_kwargs)
             for path in result
         ]

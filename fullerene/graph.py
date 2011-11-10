@@ -1,7 +1,6 @@
 class Graph(object):
     def __init__(
             self,
-            hostname,
             path,
             config=None,
             title=None,
@@ -9,14 +8,12 @@ class Graph(object):
             **kwargs
         ):
         """
-        hostname: hostname part of metric path
-        path: rest of metric path to query Graphite for when rendering
+        path: metric path to query Graphite for when rendering (includes host)
         config: config object for querying
         kwargs: graph drawing options such as 'from'
         """
         # Basic init
         self.path = path
-        self.hostname = hostname
         self.title = title
         self.title_param = title_param
 
@@ -29,7 +26,7 @@ class Graph(object):
             kwargs['title'] = (self.title + param) if self.title else self.path
 
         # Construct final target path
-        path = self.hostname + "." + self.path
+        path = self.path
         function = kwargs.pop('function', None)
         if function:
             path = "%s(%s)" % (function, path)
