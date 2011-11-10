@@ -120,8 +120,8 @@ class Metric(object):
         self.parts = self.path.split('.')
         self.wildcards = self.find_wildcards()
         # Normalize/clean up options
-        self.excludes = self.set_excludes(options.pop('excludes', ()))
-        self.to_expand = self.set_expansions(options.pop('expansions', ()))
+        self.excludes = self.set_excludes(options.pop('exclude', ()))
+        self.to_expand = self.set_expansions(options.pop('expand', ()))
         # Everything else given in the YAML config is a graphite override
         self.extra_options = options
 
@@ -202,7 +202,8 @@ class Metric(object):
         hostname = hostname.replace('.', '_')
         # Expand out to full potential list of paths, apply filters
         matches = []
-        for item in self.expand(hostname):
+        expanded = self.expand(hostname)
+        for item in expanded:
             parts = item.split('.')
             good = True
             for location, part in enumerate(parts):
@@ -212,7 +213,7 @@ class Metric(object):
                 # Which wildcard slot is this?
                 wildcard_index = self.wildcards.index(location)
                 # Is this substring listed for exclusion in this slot?
-                if part in self.excludes.get(wildcard_index, []):
+                if int(part) in self.excludes.get(wildcard_index, []):
                     good = False
                     break # move on to next metric/item
             if good:
