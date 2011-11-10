@@ -34,7 +34,7 @@ def dots_(string):
 
 @app.template_filter('dot')
 def dot_(string, *args):
-    return sliced(string, *args)
+    return sliced(string, *args) or string
 
 @app.template_filter('render')
 def _render(graph, **overrides):
