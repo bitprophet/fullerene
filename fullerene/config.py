@@ -29,12 +29,8 @@ class Config(object):
         self.metrics = {}
         for name, options in config.get('metrics', {}).iteritems():
             self.metrics[name] = Metric(
-                title=options.get('title', None),
-                title_param=options.get('title_param', None),
-                path=options['path'],
-                config=self,
-                excludes=options.get('exclude', ()),
-                expansions=options.get('expand', ())
+                options=options,
+                config=self
             )
         # Metric groups
         self.groups = {}
@@ -59,7 +55,7 @@ class Config(object):
             metric = self.metrics[item]
         # Then create one on the fly
         else:
-            metric = Metric(path=item, config=self)
+            metric = Metric({'path': item}, config=self)
         return metric
 
     @property

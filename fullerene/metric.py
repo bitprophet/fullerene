@@ -108,25 +108,19 @@ class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
     """
-    def __init__(
-            self,
-            path,
-            config,
-            excludes=(),
-            expansions=(),
-            title=None,
-            title_param=None
-        ):
-        self.title = title or path
-        self.title_param = title_param
-        self.path = path
+    def __init__(self, options, config):
+        self.path = options.pop('path')
+        self.title = options.pop('title', self.path)
+        self.title_param = options.pop('title_param', None)
         self.config = config
         # Generate split version of our path, and note any wildcards
         self.parts = self.path.split('.')
         self.wildcards = self.find_wildcards()
         # Normalize/clean up options
-        self.excludes = self.set_excludes(excludes)
-        self.to_expand = self.set_expansions(expansions)
+        self.excludes = self.set_excludes(options.pop('excludes', ()))
+        self.to_expand = self.set_expansions(options.pop('expansions', ()))
+        # Everything else given in the YAML config is a graphite override
+        self.extra_options = options
 
     def __repr__(self):
         return "<Metric %r, excluding %r, expanding %r>" % (
