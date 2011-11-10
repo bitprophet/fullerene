@@ -1,4 +1,5 @@
-graphite_uri: x
+graphite_uris:
+  internal: x
 metrics:
   implicit:
     path: foo.*.bar

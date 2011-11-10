@@ -1,4 +1,5 @@
-graphite_uri: whatever
+graphite_uris:
+  internal: whatever
 hosts:
   exclude:
     - a
@@ -15,7 +16,7 @@ metrics:
     path: foo.bar
   metric2:
     path: biz.baz
-groups:
+metric_groups:
   group1:
     - raw.path
     - metric1

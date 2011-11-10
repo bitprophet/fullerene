@@ -80,7 +80,7 @@ class TestMetrics(object):
             ("Expand second part",
                 ["foo.bar", "foo.biz"], [1], ["foo.bar", "foo.biz"]),
             ("Expand both parts",
-                ["1.2", "3.4"], [0, 1], ["1.2", "3.4", "1.4", "3.2"]),
+                ["1.2", "3.4"], [0, 1], ["1.2", "3.4"]),
         ):
             eq_.description = desc
             yield eq_, set(map(str, combine(inputs, expansions))), set(results)

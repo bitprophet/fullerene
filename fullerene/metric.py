@@ -109,6 +109,9 @@ class Metric(object):
     Beefed-up metric object capable of substituting wildcards and more!
     """
     def __init__(self, options, config):
+        # Handle just-a-string options
+        if not hasattr(options, 'pop'):
+            options = {'path': options}
         self.path = options.pop('path')
         self.title = options.pop('title', self.path)
         self.title_param = options.pop('title_param', None)
@@ -156,7 +159,7 @@ class Metric(object):
             expansions = self.wildcards 
         return expansions
 
-    def expand(self, hostname=None):
+    def expand(self, hostname=""):
         """
         Return expanded metric list from our path and the given ``hostname``.
 
@@ -180,7 +183,7 @@ class Metric(object):
             func = lambda x: x
         return map(func, self.config.graphite.query(path))
 
-    def graphs(self, hostname=None, **kwargs):
+    def graphs(self, hostname="", **kwargs):
         """
         Return 1+ Graph objects, optionally using ``hostname`` for context.
 
