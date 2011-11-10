@@ -152,6 +152,9 @@ class Metric(object):
     def set_excludes(self, excludes):
         if not hasattr(excludes, "keys"):
             excludes = {0: excludes}
+        # Stringify for any YAML ints
+        for key in excludes:
+            excludes[key] = map(str, excludes[key])
         return excludes
 
     def set_expansions(self, expansions):
@@ -213,7 +216,7 @@ class Metric(object):
                 # Which wildcard slot is this?
                 wildcard_index = self.wildcards.index(location)
                 # Is this substring listed for exclusion in this slot?
-                if int(part) in self.excludes.get(wildcard_index, []):
+                if part in self.excludes.get(wildcard_index, []):
                     good = False
                     break # move on to next metric/item
             if good:
