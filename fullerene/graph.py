@@ -28,10 +28,13 @@ class Graph(object):
                 param = " (%s)" % self.path.split('.')[self.title_param]
             kwargs['title'] = (self.title + param) if self.title else self.path
         # Try to squeeze in hostname after any potential function applications
-        path = self.path
+        print ">>> self.hostname: %r, self.path: %r" % (self.hostname, self.path)
         if '(' in self.path:
             i = self.path.rfind('(') + 1
             path = self.path[:i] + self.hostname + '.' + self.path[i:]
+        else:
+            path = self.hostname + "." + self.path
+        print "??? path now: %r" % path
         kwargs['target'] = path
         self.kwargs = kwargs
 
