@@ -216,7 +216,9 @@ class Metric(object):
                 matches.append(item)
         # Perform any necessary combining into brace-expressions & return
         result = combine(matches, self.to_expand)
-        merged_kwargs = dict(self.config.defaults, **kwargs)
+        # Precedence: defaults => overridden by extra_options => kwargs
+        first_merge = dict(self.extra_options, **kwargs)
+        merged_kwargs = dict(self.config.defaults, **first_merge)
         return [
             Graph(hostname, path, self.config, self.title, self.title_param, **merged_kwargs)
             for path in result
