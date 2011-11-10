@@ -27,15 +27,15 @@ class Graph(object):
             if self.title_param:
                 param = " (%s)" % self.path.split('.')[self.title_param]
             kwargs['title'] = (self.title + param) if self.title else self.path
-        # Try to squeeze in hostname after any potential function applications
-        print ">>> self.hostname: %r, self.path: %r" % (self.hostname, self.path)
-        if '(' in self.path:
-            i = self.path.rfind('(') + 1
-            path = self.path[:i] + self.hostname + '.' + self.path[i:]
-        else:
-            path = self.hostname + "." + self.path
-        print "??? path now: %r" % path
+
+        # Construct final target path
+        path = self.hostname + "." + self.path
+        function = kwargs.pop('function', None)
+        if function:
+            path = "%s(%s)" % (function, path)
         kwargs['target'] = path
+
+        # Set kwargs for drawing
         self.kwargs = kwargs
 
         # Store data about what our graph shows (e.g. min/max)

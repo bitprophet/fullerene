@@ -18,6 +18,9 @@ metrics:
     path: df.*.df_complex.free.value
     exclude: [dev, dev-shm, var-lock, var-run]
     expand: all
+  cpu:
+    path: cpu.*.cpu.system.value
+    function: sumSeries
 groups:
   baseline:
     - free_disk_space
