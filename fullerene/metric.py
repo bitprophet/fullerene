@@ -203,12 +203,18 @@ class Metric(object):
         object.
         """
         hostname = hostname.replace('.', '_')
+        # If %s in path, just insert hostname and skip everything else
+        if "%s" in self.path:
+            path = self.path.replace("%s", "%(hostname)s")
+            results = [path % {'hostname': hostname}]
+            return self._graphs(results, kwargs)
         # Expand out to full potential list of paths, apply filters
         matches = []
         expanded = self.expand(hostname)
         for item in expanded:
             parts = item.split('.')
             good = True
+            # Exclude any exclusions
             for location, part in enumerate(parts):
                 # We only care about wildcard slots
                 if location not in self.wildcards:
@@ -223,10 +229,14 @@ class Metric(object):
                 matches.append(item)
         # Perform any necessary combining into brace-expressions & return
         result = combine(matches, self.to_expand)
+        result = map(lambda x: "%s.%s" % (hostname, x), result)
+        return self._graphs(result, kwargs)
+
+    def _graphs(self, paths, kwargs):
         # Precedence: defaults => overridden by extra_options => kwargs
         first_merge = dict(self.extra_options, **kwargs)
         merged_kwargs = dict(self.config.defaults, **first_merge)
         return [
-            Graph("%s.%s" % (hostname, path), self.config, self.title, self.title_param, **merged_kwargs)
-            for path in result
+            Graph(path, self.config, self.title, self.title_param, **merged_kwargs)
+            for path in paths
         ]

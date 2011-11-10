@@ -19,8 +19,13 @@ metrics:
     exclude: [dev, dev-shm, var-lock, var-run]
     expand: all
   cpu:
-    path: cpu.*.cpu.system.value
-    function: sumSeries
+    title: CPU usage
+    # Paths with %s in them skip all expand/exclude mechanisms and instead
+    # replace %s with the hostname at render time.
+    path: "group(sumSeries(%s.cpu.*.cpu.system.value),sumSeries(%s.cpu.*.cpu.user.value))"
+    # Arbitrary graphite render args may be specified as well and are passed
+    # through
+    areaMode: stacked
 groups:
   baseline:
     - free_disk_space
