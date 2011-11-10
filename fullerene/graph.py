@@ -27,7 +27,12 @@ class Graph(object):
             if self.title_param:
                 param = " (%s)" % self.path.split('.')[self.title_param]
             kwargs['title'] = (self.title + param) if self.title else self.path
-        kwargs['target'] = "%s.%s" % (self.hostname, self.path)
+        # Try to squeeze in hostname after any potential function applications
+        path = self.path
+        if '(' in self.path:
+            i = self.path.rfind('(') + 1
+            path = self.path[:i] + self.hostname + '.' + self.path[i:]
+        kwargs['target'] = path
         self.kwargs = kwargs
 
         # Store data about what our graph shows (e.g. min/max)
