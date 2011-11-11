@@ -64,7 +64,7 @@ def composer(graph):
 def index():
     collections = [
         ('by_domain', {
-            'title': 'All hosts, by domain name',
+            'title': 'Per-host pages, by domain',
             'groups': config.graphite.hosts_by_domain(),
         })
     ]
