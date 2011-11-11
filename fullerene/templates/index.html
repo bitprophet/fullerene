@@ -5,20 +5,18 @@
         <h1>Collections</h1>
     </div>
 </div>
+{% for tuple in collections|batch(4) %}
 <div class="row">
-    <div class="span16">
+    {% for slug, collection in tuple %}
+    <div class="span4">
+        <p><strong>{{ collection.title }}</strong></p>
         <ul>
-        {% for slug, collection in collections %}
-            <li>
-                <strong>{{ collection.title }}</strong>
-                <ul>
-                {% for group in collection.groups|sort %}
-                <li><a href="{{ url_for('group', collection=slug, group=group) }}">{{ group }}</a></li>
-                {% endfor %}
-                </ul>
-            </li>
+        {% for group in collection.groups|sort %}
+        <li><a href="{{ url_for('group', collection=slug, group=group) }}">{{ group }}</a></li>
         {% endfor %}
         </ul>
     </div>
+    {% endfor %}
 </div>
+{% endfor %}
 {% endblock %}
