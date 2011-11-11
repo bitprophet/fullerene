@@ -123,12 +123,18 @@ def host(domain, host, metric_group, period):
     graphite_host = host + '_' + domain.replace('.', '_')
     graphs = map(lambda m: m.graphs(graphite_host, **kwargs), raw_metrics)
     merged = reduce(operator.add, graphs, [])
+    # Set up metric group nav
+    metric_groups = map(
+        lambda x: (x, flask.url_for('host', domain=domain, metric_group=x,
+            host=host, period=period)),
+        config.metric_groups
+    )
     return flask.render_template(
         'host.html',
         domain=domain,
         host=host,
         metrics=merged,
-        metric_groups=config.metric_groups,
+        metric_groups=metric_groups,
         periods=config.periods.keys(),
         current_group=metric_group,
         current_period=period,

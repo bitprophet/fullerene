@@ -3,16 +3,7 @@
 <div class="row">
     <div class="span16">
         <h1 style="margin-bottom: 0">{{ host }}.<a href="{{ url_for('domain', domain=domain) }}">{{ domain }}</a></h1>
-        <p>
-            {% for mgroup in metric_groups %}
-                {% if mgroup == current_group %}
-                    <strong>{{ mgroup }}</strong>
-                {% else %}
-                    <a href="{{ url_for('host', domain=domain, metric_group=mgroup, host=host, period=current_period) }}">{{ mgroup }}</a>
-                {% endif %}
-                {% if not loop.last %}|{% endif %}
-            {% endfor %}
-        </p>
+        <p>{% include "_metric_groups.html" %}</p>
         <p>
         timeperiod:
         {% for period in periods %}

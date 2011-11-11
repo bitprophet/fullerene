@@ -1,0 +1,8 @@
+{% for mgroup, url in metric_groups %}
+    {% if mgroup == current_group %}
+        <strong>{{ mgroup }}</strong>
+    {% else %}
+        <a href="{{ url }}">{{ mgroup }}</a>
+    {% endif %}
+    {% if not loop.last %}|{% endif %}
+{% endfor %}
