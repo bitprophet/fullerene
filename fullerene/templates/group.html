@@ -2,18 +2,7 @@
 {% block body %}
 <div class="row">
     <div class="span16">
-        <h1>{{ group.title }}</h1>
-        <p><a href="{{ url_for('index') }}">&laquo; Index</a></p>
-    </div>
-</div>
-<div class="row">
-    <div class="span16">
-        <p>Time period: <strong>{{ period }}</strong></p>
-    </div>
-</div>
-{% for metric in group.metrics %}
-<div class="row">
-    <div class="span16">
+        <h1 style="margin-bottom: 0;"><a href="{{ parent }}">{{ group.title }}</a></h1>
         <h3 style="display: inline;">{{ metric.title }}</h3>
         <span>(
         {% if "%s" not in metric.path %}
@@ -24,7 +13,17 @@
         )</span>
     </div>
 </div>
-    {% for hosts in group.hosts|sort|batch(per_row) %}
+<div class="row">
+    <div class="span16">
+        <p>{% include "_metric_groups.html" %}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="span16">
+        <p>Time period: <strong>{{ period }}</strong></p>
+    </div>
+</div>
+{% for hosts in group.hosts|sort|batch(per_row) %}
 <div class="row">
     <div class="span16">
     {% for host in hosts %}
@@ -37,6 +36,5 @@
     {% endfor %}
     </div>
 </div>
-    {% endfor %}
 {% endfor %}
 {% endblock %}

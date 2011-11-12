@@ -108,10 +108,11 @@ class Metric(object):
     """
     Beefed-up metric object capable of substituting wildcards and more!
     """
-    def __init__(self, options, config):
+    def __init__(self, options, config, name=""):
         # Handle just-a-string options
         if not hasattr(options, 'pop'):
             options = {'path': options}
+        self.name = name
         self.path = options.pop('path')
         self.title = options.pop('title', self.path)
         self.title_param = options.pop('title_param', None)

@@ -1,5 +1,5 @@
 {% for mgroup, url in metric_groups %}
-    {% if mgroup == current_group %}
+    {% if mgroup == current_mgroup %}
         <strong>{{ mgroup }}</strong>
     {% else %}
         <a href="{{ url }}">{{ mgroup }}</a>

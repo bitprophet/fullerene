@@ -91,9 +91,40 @@ def domain(domain):
 @app.route('/<collection>/<group>/')
 def group(collection, group):
     collection = config.collections[collection]
+    return flask.render_template(
+        'collection_group.html',
+        collection=collection,
+        group=collection['groups'][group]
+    )
+
+@app.route('/<collection>/<group>/<metric>/')
+def group_metric(collection, group, metric):
+    # Basic setup
+    period = '-4hours'
+    cname = collection
+    collection = config.collections[collection]
+    gname = group
+    group = collection['groups'][group]
+    # Slug => metric object
+    mobj = None
+    for m in group['metrics']:
+        if m.name == metric:
+            mobj = m
+            break
+    if mobj is None:
+        flask.abort(404)
+    # Metric-based nav
+    metric_groups = map(
+        lambda x: (x, flask.url_for('group_metric', collection=cname,
+            group=gname, metric=x)),
+        [x.name for x in group['metrics']]
+    )
+    parent = flask.url_for('group', collection=cname, group=gname)
+    print metric_groups
+    # Grid setup
     per_row = 5
     col_size = (16 / per_row)
-    period = '-4hours'
+    # Thumbnails
     thumbnail_opts = {
         'height': 100,
         'width': 200,
@@ -106,11 +137,15 @@ def group(collection, group):
     return flask.render_template(
         'group.html',
         collection=collection,
-        group=collection['groups'][group],
+        group=group,
+        metric=mobj,
+        metric_groups=metric_groups,
+        current_mgroup=metric,
         per_row=per_row,
         col_size=col_size,
         thumbnail_opts=thumbnail_opts,
-        period=period
+        period=period,
+        parent=parent
     )
 
 @app.route('/by_domain/<domain>/<host>/<metric_group>/<period>/')
@@ -136,7 +171,7 @@ def host(domain, host, metric_group, period):
         metrics=merged,
         metric_groups=metric_groups,
         periods=config.periods.keys(),
-        current_group=metric_group,
+        current_mgroup=metric_group,
         current_period=period,
     )
 
