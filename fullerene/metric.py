@@ -207,7 +207,7 @@ class Metric(object):
         hostname = hostname.replace('.', '_')
         # If %-expressions in path, or raw=True, just insert hostname and skip
         # parsing
-        group = kwargs.pop('group')
+        group = kwargs.pop('group', "")
         if "%s" in self.path or "%g" in self.path or self.raw:
             path = self.path.replace("%s", "%(hostname)s")
             path = self.path.replace("%g", "%(group)s")
