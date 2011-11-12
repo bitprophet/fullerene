@@ -1,0 +1,22 @@
+{% if graph|composer %}
+<a href="{{ graph|composer }}" title="Click for Graphite composer">
+    <img src="{{ graph|render }}" />
+</a>
+{% else %}
+    <img src="{{ graph|render }}" />
+{% endif %}
+<table>
+    <thead>
+        <tr><th>Metric</th><th>Min</th><th>Max</th><th>Mean</th></tr>
+    </thead>
+    <tbody>
+    {% for metric in graph.stats %}
+    <tr>
+        <td>{{ metric.target|dot(1, -1) }}</td>
+        <td>{{ metric.stats.formatted.min }}</td>
+        <td>{{ metric.stats.formatted.max }}</td>
+        <td>{{ metric.stats.formatted.mean }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
