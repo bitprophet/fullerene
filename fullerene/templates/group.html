@@ -6,7 +6,7 @@
         <h3 style="display: inline;">{{ metric.title }}</h3>
         <span>(
         {% if "%s" not in metric.path %}
-        {{ metric.path|truncate(20, True) }}
+        {{ metric.path|truncate(30, True) }}
         {% else %}
         it's complicated
         {% endif %}
