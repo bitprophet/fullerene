@@ -120,7 +120,6 @@ def group_metric(collection, group, metric):
         [x.name for x in group['metrics']]
     )
     parent = flask.url_for('group', collection=cname, group=gname)
-    print metric_groups
     # Grid setup
     per_row = 5
     col_size = (16 / per_row)
