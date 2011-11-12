@@ -97,7 +97,7 @@ def group(collection, group):
     return flask.render_template(
         'collection_group.html',
         cname=cname,
-        gname=gname,
+        group=group,
         metrics=group['metrics']
     )
 
