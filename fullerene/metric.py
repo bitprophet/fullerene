@@ -205,10 +205,13 @@ class Metric(object):
         object.
         """
         hostname = hostname.replace('.', '_')
-        # If %s in path, or raw=True, just insert hostname and skip parsing
-        if "%s" in self.path or self.raw:
+        # If %-expressions in path, or raw=True, just insert hostname and skip
+        # parsing
+        group = kwargs.pop('group')
+        if "%s" in self.path or "%g" in self.path or self.raw:
             path = self.path.replace("%s", "%(hostname)s")
-            results = [path % {'hostname': hostname}]
+            path = self.path.replace("%g", "%(group)s")
+            results = [path % {'hostname': hostname, 'group': group}]
             return self._graphs(results, kwargs)
         # Expand out to full potential list of paths, apply filters
         matches = []

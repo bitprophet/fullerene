@@ -99,6 +99,7 @@ def group(collection, group):
         'collection_group.html',
         cname=cname,
         group=group,
+        gname=gname,
         metrics=group['metrics']
     )
 

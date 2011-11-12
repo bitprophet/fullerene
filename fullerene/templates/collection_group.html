@@ -10,7 +10,7 @@
     <div class="span16">
         <h3>Overview</h3>
         {% for metric in group.overview %}
-            {% for graph in metric.graphs() %}
+            {% for graph in metric.graphs(group=gname) %}
                 {% include "_graph.html" %}
             {% endfor %}
         {% endfor %}
