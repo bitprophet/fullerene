@@ -9,12 +9,18 @@
 <div class="row">
     <div class="span16">
         <h3>Overview</h3>
-        {% for metric in group.overview %}
+    </div>
+</div>
+<div class="row">
+    {% for tuple in group.overview|batch(2) %}
+    <div class="span7">
+        {% for metric in tuple %}
             {% for graph in metric.graphs(group=gname) %}
                 {% include "_graph.html" %}
             {% endfor %}
         {% endfor %}
     </div>
+    {% endfor %}
 </div>
 <div class="row">
     <div class="span16">
