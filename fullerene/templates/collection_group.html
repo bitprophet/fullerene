@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row">
+    <div class="span16">
+        <h1>{{ gname }}</h1>
+        <p><a href="{{ url_for('index') }}">&laquo; Index</a></p>
+    </div>
+</div>
+<div class="row">
+    <div class="span16">
+        <h3>Overview</h3>
+        <ul>
+            <li>www response time for this project's site</li>
+            <li>other overviewy things</li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div class="span16">
+        <h3>Metric thumbnails</h3>
+        <ul>
+            {% for metric in metrics %}
+            <li>
+                <a href="{{ url_for('group_metric', collection=cname, group=gname, metric=metric.name) }}">{{ metric.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

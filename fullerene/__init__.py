@@ -90,11 +90,15 @@ def domain(domain):
 
 @app.route('/<collection>/<group>/')
 def group(collection, group):
+    cname = collection
+    gname = group
     collection = config.collections[collection]
+    group = collection['groups'][group]
     return flask.render_template(
         'collection_group.html',
-        collection=collection,
-        group=collection['groups'][group]
+        cname=cname,
+        gname=gname,
+        metrics=group['metrics']
     )
 
 @app.route('/<collection>/<group>/<metric>/')
