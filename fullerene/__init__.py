@@ -90,6 +90,7 @@ def domain(domain):
 
 @app.route('/<collection>/<group>/')
 def group(collection, group):
+    # Setup
     cname = collection
     gname = group
     collection = config.collections[collection]

@@ -40,8 +40,14 @@ class Config(object):
         # 'collections'
         self.collections = config.get('collections', {})
         for collection in self.collections.values():
+            # Instantiate metrics where needed
             for group in collection['groups'].values():
                 group['metrics'] = map(self.parse_metric, group['metrics'])
+                if 'overview' in group:
+                    group['overview'] = map(
+                        self.parse_metric,
+                        group['overview'][:]
+                    )
         # Default graph args
         self.defaults = config.get('defaults', {})
         # Timeperiod aliases

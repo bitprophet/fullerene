@@ -117,6 +117,7 @@ class Metric(object):
         self.title = options.pop('title', self.path)
         self.title_param = options.pop('title_param', None)
         self.config = config
+        self.raw = options.pop('raw', False)
         # Generate split version of our path, and note any wildcards
         self.parts = self.path.split('.')
         self.wildcards = self.find_wildcards()
@@ -204,8 +205,8 @@ class Metric(object):
         object.
         """
         hostname = hostname.replace('.', '_')
-        # If %s in path, just insert hostname and skip everything else
-        if "%s" in self.path:
+        # If %s in path, or raw=True, just insert hostname and skip parsing
+        if "%s" in self.path or self.raw:
             path = self.path.replace("%s", "%(hostname)s")
             results = [path % {'hostname': hostname}]
             return self._graphs(results, kwargs)
