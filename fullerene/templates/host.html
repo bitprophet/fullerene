@@ -10,7 +10,7 @@
             {% if period == current_period %}
                 <strong>{{ period }}</strong>
             {% else %}
-                <a href="{{ url_for('host', domain=domain, metric_group=current_group, host=host, period=period) }}">{{ period }}</a>
+                <a href="{{ url_for('host', domain=domain, metric_group=current_mgroup, host=host, period=period) }}">{{ period }}</a>
             {% endif %}
             {% if not loop.last %}|{% endif %}
         {% endfor %}
