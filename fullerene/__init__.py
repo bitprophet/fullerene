@@ -150,7 +150,8 @@ def group_metric(collection, group, metric):
         col_size=col_size,
         thumbnail_opts=thumbnail_opts,
         period=period,
-        parent=parent
+        parent=parent,
+        gname=gname
     )
 
 @app.route('/by_domain/<domain>/<host>/<metric_group>/<period>/')
