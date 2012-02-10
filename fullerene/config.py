@@ -54,12 +54,24 @@ class Config(object):
         self.periods = config.get('periods', {})
 
     def parse_metric(self, item):
-        # First check for any named metrics
-        if item in self.metrics:
+        exists = False
+        try:
+            exists = item in self.metrics
+        except TypeError:
+            pass
+        # Name + name already exists as a metric alias == use that
+        if exists:
             metric = self.metrics[item]
-        # Then create one on the fly
         else:
-            metric = Metric({'path': item}, config=self, name=item)
+            # String == metric path == make new metric from it
+            if isinstance(item, basestring):
+                metric = Metric({'path': item}, config=self, name=item)
+            # Non-string == assume hash/dict == make metric from that (assumes
+            # one-item dict, name => metric)
+            else:
+                print "ZOMG %r" % item
+                name, value = item.items()[0]
+                metric = Metric(name=name, config=self, options=value)
         return metric
 
     @property

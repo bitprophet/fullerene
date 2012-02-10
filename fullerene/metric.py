@@ -216,6 +216,8 @@ class Metric(object):
                     .replace("%g", "%(group)s")
                 )
                 results = [path % {'hostname': hostname, 'group': group}]
+            else:
+                results = [self.path]
             return self._graphs(results, kwargs)
         # Expand out to full potential list of paths, apply filters
         matches = []
