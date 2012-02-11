@@ -69,7 +69,6 @@ class Config(object):
             # Non-string == assume hash/dict == make metric from that (assumes
             # one-item dict, name => metric)
             else:
-                print "ZOMG %r" % item
                 name, value = item.items()[0]
                 metric = Metric(name=name, config=self, options=value)
         return metric
